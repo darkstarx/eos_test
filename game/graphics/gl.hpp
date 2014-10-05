@@ -6,9 +6,11 @@
 	#ifdef _WIN32	// Windows
 		#include <glew.h>
 		#include <GL/gl.h>
+		#include <GL/glu.h>
 	#else			// Linux
 		#define GL_GLEXT_PROTOTYPES
 		#include <GL/gl.h>
+		#include <GL/glu.h>
 		#include <GL/glext.h>
 	#endif
 #else

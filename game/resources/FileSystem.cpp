@@ -1,4 +1,4 @@
-#include "FileSystem.h"
+#include "FileSystem.hpp"
 
 #ifndef RESOURCES_PATH
 #define RESOURCES_PATH "resources\\"

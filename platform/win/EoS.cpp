@@ -1,7 +1,7 @@
+#include <Windows.h>
 #include <SDL2/SDL.h>
-#include <utils/log.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include <utils/winlog.hpp>
+#include <graphics/gl.hpp>
 #include <iostream>
 
 #define WINDOW_WIDTH 800
@@ -108,8 +108,15 @@ void drawCube(float xrf, float yrf, float zrf)
 }
 
 
-int main(int argc, char ** argv)
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int iCmdShow)
 {
+	// initialize logging
+	FLAGS_logtostderr = true;
+	FLAGS_colorlogtostderr = true;
+	google::InitGoogleLogging("EoS");
+	std::shared_ptr<WinDebugSink> sink(new WinDebugSink());
+	google::AddLogSink(sink.get());
+	
 	init();
 	
 	bool running = true;

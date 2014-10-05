@@ -1,8 +1,6 @@
 #include <SDL2/SDL.h>
-#include <utils/log.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <iostream>
+#include <utils/log.hpp>
+#include <graphics/gl.hpp>
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
@@ -17,7 +15,7 @@ void init()
 	// Initialize SDL
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
-		std::cout << "Unable to init SDL, error: " << SDL_GetError() << std::endl;
+		LOG(ERROR) << "Unable to init SDL, error: " << SDL_GetError();
 		exit(EXIT_FAILURE);
 	}
 	
@@ -39,7 +37,7 @@ void init()
 	
 	if (window == NULL)
 	{
-		std::cout << "Unable to create window, error: " << SDL_GetError() << std::endl;
+		LOG(ERROR) << "Unable to create window, error: " << SDL_GetError();
 		exit(EXIT_FAILURE);
 	}
 	
@@ -110,6 +108,11 @@ void drawCube(float xrf, float yrf, float zrf)
 
 int main(int argc, char ** argv)
 {
+	// initialize logging
+	FLAGS_logtostderr = true;
+	FLAGS_colorlogtostderr = true;
+	google::InitGoogleLogging("EoS");
+	
 	init();
 	
 	bool running = true;

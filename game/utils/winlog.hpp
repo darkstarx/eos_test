@@ -1,7 +1,7 @@
 #ifndef WINLOG_HPP
 #define	WINLOG_HPP
 
-#include "log.h"
+#include "log.hpp"
 #include <iomanip>
 
 
