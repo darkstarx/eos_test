@@ -1,0 +1,3 @@
+list(APPEND GAME_DEFINES
+	RESOURCES_PATH="${PROJECT_DIR}/resources/"
+)
