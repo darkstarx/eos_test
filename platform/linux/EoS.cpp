@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include <utils/log.hpp>
 #include <graphics/gl.hpp>
+#include <chrono>
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
@@ -20,9 +21,9 @@ void init()
 	}
 	
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
-	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 6);
-	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
+	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
 	
 	static const std::string app_name = "eos_test";
 	window = SDL_CreateWindow(
@@ -117,6 +118,10 @@ int main(int argc, char ** argv)
 	
 	bool running = true;
 	float xrf = 0, yrf = 0, zrf = 0;
+	
+	std::chrono::steady_clock::time_point last_time = std::chrono::steady_clock::now();
+	unsigned long int frames = 0;
+	
 	while(running)
 	{
 		SDL_Event event;
@@ -147,6 +152,16 @@ int main(int argc, char ** argv)
 		
 		glFlush();
 		SDL_GL_SwapWindow(window);
+		
+		++frames;
+		
+		const std::chrono::steady_clock::time_point curr_time = std::chrono::steady_clock::now();
+		const std::chrono::duration<double> tm = curr_time - last_time;
+		if (tm.count() >= 1.0) {
+			LOG(INFO) << "!!!=== tm :" << tm.count() << " fps: " << frames / tm.count();
+			frames = 0;
+			last_time = curr_time;
+		}
 	}
 	
 	SDL_Quit();

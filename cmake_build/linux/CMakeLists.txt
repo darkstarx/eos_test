@@ -98,3 +98,7 @@ set_target_properties(${PROJECT_NAME}
 	PROPERTIES
 	COMPILE_DEFINITIONS "${GAME_DEFINES}"
 )
+
+add_definitions(
+    -std=c++11
+)
