@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
@@ -19,7 +20,7 @@ public class EOSActivity extends Activity {
 	
 	protected RelativeLayout m_layout = null;
 	protected EOSGLSurfaceView m_glView = null;
-
+	
 	public static EOSActivity getInstance() {
 		return m_instance;
 	}
@@ -31,6 +32,13 @@ public class EOSActivity extends Activity {
 		final Window window = getWindow();
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		
+		m_layout = new RelativeLayout(this);
+		setContentView(m_layout);
+		
+		m_glView = new EOSGLSurfaceView(this);
+		m_glView.setKeepScreenOn(true);
+		m_layout.addView(m_glView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 		
 		nativeOnCreate();
 	}
@@ -74,14 +82,14 @@ public class EOSActivity extends Activity {
 	@Override
 	protected void onDestroy()
 	{
-		super.onDestroy();
+		nativeOnDestroy();
+		
 		m_glView.setVisibility(View.INVISIBLE);
 		m_glView = null;
 		m_layout = null;
 		
-		nativeOnDestroy();
-		
 		m_instance = null;
+		super.onDestroy();
 	}
 	
 	@Override
@@ -94,7 +102,10 @@ public class EOSActivity extends Activity {
 		}
 		return super.onKeyDown(keyCode, event);
 	}
-
+	
+	static {
+		System.loadLibrary("eos_client");
+	}
 	
 	private native void nativeOnCreate();
 	private native void nativeOnDestroy();

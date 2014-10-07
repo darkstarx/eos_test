@@ -1,5 +1,5 @@
-#ifndef GL_HPP
-#define GL_HPP
+#ifndef GRAPHICS_GL_HPP
+#define GRAPHICS_GL_HPP
 
 
 #if defined __DESKTOP__
@@ -13,6 +13,10 @@
 		#include <GL/glu.h>
 		#include <GL/glext.h>
 	#endif
+#elif defined __ANDROID__
+	#define GL_GLEXT_PROTOTYPES
+	#include <GLES2/gl2.h>
+	#include <GLES2/gl2ext.h>
 #else
 	#error "Unknown platform"
 #endif
@@ -23,4 +27,4 @@
 #endif//__DESKTOP__
 
 
-#endif//GL_HPP
+#endif //GRAPHICS_GL_HPP

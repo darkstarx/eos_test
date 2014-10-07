@@ -31,3 +31,8 @@ build/
 # Project/session files
 *.kdev4
 .kdev_include_paths
+platform/android/bin/
+platform/android/gen/
+
+# Other
+.directory

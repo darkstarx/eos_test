@@ -19,6 +19,18 @@ set(SOURCE_FILES
 	${SRC_GAME_UTILS}
 )
 
+# Enable CCache
+find_program(CCACHE_PATH ccache)
+if(NOT ${CCACHE_PATH} MATCHES CCACHE_PATH-NOTFOUND)
+	message(STATUS "CCache found: ${CCACHE_PATH}")
+	set(CMAKE_C_COMPILER_ARG1 ${CMAKE_C_COMPILER})
+	set(CMAKE_C_COMPILER ${CCACHE_PATH})
+	set(CMAKE_CXX_COMPILER_ARG1 ${CMAKE_CXX_COMPILER})
+	set(CMAKE_CXX_COMPILER ${CCACHE_PATH}) 
+else()
+	message(STATUS "CCache not found")
+endif()
+
 # Find OpenGL
 find_package(OpenGL REQUIRED)
 if (OPENGL_FOUND)
@@ -35,52 +47,15 @@ else (SDL2_FOUND)
 	message("SDL2 environment missing")
 endif (SDL2_FOUND)
 
-# google-glog
-find_package(GLog)
-if (NOT GLOG_FOUND)
-	set(GLOG_LIB_DIR ${CMAKE_BINARY_DIR}/libs/glog/lib)
-	message(STATUS "Searching for GLog library: ${GLOG_LIB_DIR}")
-	find_library(GLOG_LIBRARIES
-		NAMES glog
-		PATHS ${GLOG_LIB_DIR}
-	)
-	if (NOT GLOG_LIBRARIES)
-		message(STATUS "Searching for GLog library: ${GLOG_LIB_DIR} -- not found")
-		# google-glog compilation and linking libglog.so
-		message(STATUS "Building GLog in ${CMAKE_BINARY_DIR}/libs/glog-compile...")
-		execute_process(COMMAND mkdir -p ${CMAKE_BINARY_DIR}/libs/glog-compile)
-		execute_process(
-			COMMAND ${PROJECT_DIR}/lib/glog/configure --prefix=${CMAKE_BINARY_DIR}/libs/glog
-			WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/libs/glog-compile
-			OUTPUT_QUIET
-			OUTPUT_FILE "configure.log"
-		)
-		message(STATUS "Installing GLog in ${CMAKE_BINARY_DIR}/libs/glog...")
-		execute_process(
-			COMMAND make install -j4
-			WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/libs/glog-compile
-			OUTPUT_QUIET
-		)
-		if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-			set(GLOG_LIBRARIES ${CMAKE_BINARY_DIR}/libs/glog/lib64/libglog.so)
-		else(CMAKE_SIZEOF_VOID_P EQUAL 8)
-			set(GLOG_LIBRARIES ${CMAKE_BINARY_DIR}/libs/glog/lib/libglog.so)
-		endif(CMAKE_SIZEOF_VOID_P EQUAL 8)
-		set(GLOG_INCLUDE_DIR ${CMAKE_BINARY_DIR}/libs/glog/include)
-	endif (NOT GLOG_LIBRARIES)
-endif (NOT GLOG_FOUND)
-message(STATUS "GLog includes: ${GLOG_INCLUDE_DIR} Libraries: ${GLOG_LIBRARIES}" )
-
 
 include_directories(
 	${PROJECT_DIR}/game
-	${GLOG_INCLUDE_DIR}
 )
 
 set(EXT_LIBRARIES
 	${OPENGL_LIBRARIES}
 	${SDL2_LIBRARIES}
-	${GLOG_LIBRARIES}
+	pthread
 )
 
 include(${PROJECT_DIR}/cmake_build/common/game.cmake)

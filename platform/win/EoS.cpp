@@ -1,30 +1,34 @@
 #include <Windows.h>
 #include <SDL2/SDL.h>
-#include <utils/winlog.hpp>
-#include <graphics/gl.hpp>
-#include <iostream>
+#include <utils/log.hpp>
+#include <Application.hpp>
+#include <thread>
+#include <atomic>
+#include <chrono>
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 
 
-// Declare window and renderer
-SDL_Window * window;
+SDL_Window * window;								///< Окно приложения
+static const float TICK_INTERVAL = 1000.0f / 60.0f;	///< Время между тиками в миллисекундах
+std::atomic<bool> render_working;					///< признак активности графического потока
+std::shared_ptr<std::thread> render_thread;			///< объект управления графическим потоком
 
 
-void init()
+void init_SDL_graphics()
 {
-	// Initialize SDL
+	// Инициализируем SDL графику
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
-		std::cout << "Unable to init SDL, error: " << SDL_GetError() << std::endl;
+		LOG(ERR) << "Unable to init SDL, error: " << SDL_GetError();
 		exit(EXIT_FAILURE);
 	}
 	
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
-	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 6);
-	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
+	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
 	
 	static const std::string app_name = "eos_test";
 	window = SDL_CreateWindow(
@@ -35,98 +39,70 @@ void init()
 		SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL
 	);
 	
-	SDL_GLContext glcontext = SDL_GL_CreateContext(window);
-	
 	if (window == NULL)
 	{
-		std::cout << "Unable to create window, error: " << SDL_GetError() << std::endl;
+		LOG(ERR) << "Unable to create window, error: " << SDL_GetError();
 		exit(EXIT_FAILURE);
 	}
-	
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClearDepth(1.0);
-	glDepthFunc(GL_LESS);
-	glEnable(GL_DEPTH_TEST);
-	glShadeModel(GL_SMOOTH);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(45.0f, (float)WINDOW_WIDTH /(float) WINDOW_HEIGHT, 0.1f, 100.0f);
-	glMatrixMode(GL_MODELVIEW);
 }
 
 
-void drawCube(float xrf, float yrf, float zrf)
+void graphics_worker()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	// Создаем GL-контекст
+	SDL_GLContext glcontext = SDL_GL_CreateContext(window);
 	
-	glLoadIdentity();
-	glTranslatef(0.0f, 0.0f, -7.0f);    // Сдвинуть вглубь экрана
+	// Сообщаем рендереру о том, что поверхность сформирована
+	app()->renderer()->on_surface_changed(WINDOW_WIDTH, WINDOW_HEIGHT, true);
 	
-	glRotatef(xrf, 1.0f, 0.0f, 0.0f);   // Вращение куба по X, Y, Z
-	glRotatef(yrf, 0.0f, 1.0f, 0.0f);   // Вращение куба по X, Y, Z
-	glRotatef(zrf, 0.0f, 0.0f, 1.0f);   // Вращение куба по X, Y, Z
-	
-	glBegin(GL_QUADS);                  // Рисуем куб
-	
-	glColor3f(0.0f, 1.0f, 0.0f);        // Синяя сторона (Верхняя)
-	glVertex3f( 1.0f, 1.0f, -1.0f);     // Верхний правый угол квадрата
-	glVertex3f(-1.0f, 1.0f, -1.0f);     // Верхний левый
-	glVertex3f(-1.0f, 1.0f,  1.0f);     // Нижний левый
-	glVertex3f( 1.0f, 1.0f,  1.0f);     // Нижний правый
-	
-	glColor3f(1.0f, 0.5f, 0.0f);        // Оранжевая сторона (Нижняя)
-	glVertex3f( 1.0f, -1.0f,  1.0f);    // Верхний правый угол квадрата
-	glVertex3f(-1.0f, -1.0f,  1.0f);    // Верхний левый
-	glVertex3f(-1.0f, -1.0f, -1.0f);    // Нижний левый
-	glVertex3f( 1.0f, -1.0f, -1.0f);    // Нижний правый
-	
-	glColor3f(1.0f, 0.0f, 0.0f);        // Красная сторона (Передняя)
-	glVertex3f( 1.0f,  1.0f, 1.0f);     // Верхний правый угол квадрата
-	glVertex3f(-1.0f,  1.0f, 1.0f);     // Верхний левый
-	glVertex3f(-1.0f, -1.0f, 1.0f);     // Нижний левый
-	glVertex3f( 1.0f, -1.0f, 1.0f);     // Нижний правый
-	
-	glColor3f(1.0f,1.0f,0.0f);          // Желтая сторона (Задняя)
-	glVertex3f( 1.0f, -1.0f, -1.0f);    // Верхний правый угол квадрата
-	glVertex3f(-1.0f, -1.0f, -1.0f);    // Верхний левый
-	glVertex3f(-1.0f,  1.0f, -1.0f);    // Нижний левый
-	glVertex3f( 1.0f,  1.0f, -1.0f);    // Нижний правый
-	
-	glColor3f(0.0f,0.0f,1.0f);          // Синяя сторона (Левая)
-	glVertex3f(-1.0f,  1.0f,  1.0f);    // Верхний правый угол квадрата
-	glVertex3f(-1.0f,  1.0f, -1.0f);    // Верхний левый
-	glVertex3f(-1.0f, -1.0f, -1.0f);    // Нижний левый
-	glVertex3f(-1.0f, -1.0f,  1.0f);    // Нижний правый
-	
-	glColor3f(1.0f,0.0f,1.0f);          // Фиолетовая сторона (Правая)
-	glVertex3f( 1.0f,  1.0f, -1.0f);    // Верхний правый угол квадрата
-	glVertex3f( 1.0f,  1.0f,  1.0f);    // Верхний левый
-	glVertex3f( 1.0f, -1.0f,  1.0f);    // Нижний левый
-	glVertex3f( 1.0f, -1.0f, -1.0f);    // Нижний правый
-	
-	glEnd();                            // Закончили квадраты   
+	// Для контроля fps определяем максимальный fps = 60
+	const std::chrono::duration<float, std::milli> normal_duration(TICK_INTERVAL);
+	std::chrono::time_point<std::chrono::steady_clock> start, end;
+	// Выполняем графический цикл, пока приложение не будет остановлено
+	while (render_working)
+	{
+		start = std::chrono::steady_clock::now();
+		// Рисуем
+		if (!app()->renderer()->is_valid()) {
+			app()->renderer()->on_draw_frame();
+			SDL_GL_SwapWindow(window);
+		}
+		end = std::chrono::steady_clock::now();
+		// Отмечаем длительность отрисовки кадра
+		const std::chrono::duration<float, std::milli> duration = end - start;
+		// Если на отрисовку ушло меньше normal_duration, ждем следующего тика
+		if (duration < normal_duration) {
+			std::this_thread::sleep_for(normal_duration - duration);
+		}
+	}
+	// Графический поток останавливается, освобождаем GL-контекст
+	SDL_GL_DeleteContext(glcontext);
 }
 
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int iCmdShow)
 {
-	// initialize logging
-	FLAGS_logtostderr = true;
-	FLAGS_colorlogtostderr = true;
-	google::InitGoogleLogging("EoS");
-	std::shared_ptr<WinDebugSink> sink(new WinDebugSink());
-	google::AddLogSink(sink.get());
+	// Создаем приложение
+	app()->create();
 	
-	init();
+	// Создаем графическое окно
+	init_SDL_graphics();
 	
+	// Создаем рендерер и запускаем графическую нить
+	app()->create_renderer();
+	render_working = true;
+	render_thread.reset(new std::thread(std::bind(&graphics_worker)));
+	
+	// Время последнего тика
+	std::chrono::time_point<std::chrono::steady_clock> last_tick_time = std::chrono::steady_clock::now();
+	// Запускаем цикл обработки сообщений от окна
 	bool running = true;
-	float xrf = 0, yrf = 0, zrf = 0;
-	while(running)
+	while (running)
 	{
+		// Ожидаем сообщений (пока их нет, основной поток спит или тикает)
 		SDL_Event event;
-		
-		while(SDL_PollEvent(&event))
-		{
+		if (SDL_WaitEventTimeout(&event, (int)TICK_INTERVAL)) {
+			// Получили сообщение
 			switch(event.type)
 			{
 				case SDL_QUIT:
@@ -141,19 +117,31 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 					}
 					break;
 			}
+			std::chrono::time_point<std::chrono::steady_clock> now = std::chrono::steady_clock::now();
+			std::chrono::duration<float, std::milli> duration(now - last_tick_time);
+			if (duration.count() >= TICK_INTERVAL) {
+				// Пора тикать
+				last_tick_time = now;
+				app()->tick();
+			}
+		} else {
+			// Не дождались сообщения, значит пришло время тикать
+			last_tick_time = std::chrono::steady_clock::now();
+			app()->tick();
 		}
-		
-		xrf -= 0.5;
-		yrf -= 0.5;
-		zrf -= 0.5;
-		
-		drawCube(xrf, yrf, zrf); // рисуем сам куб с текущими углами поворота
-		
-		glFlush();
-		SDL_GL_SwapWindow(window);
 	}
 	
+	// Разрушаем рендерер и останавливаем графический поток
+	app()->destroy_renderer();
+	render_working = false;
+	render_thread->join();
+	
+	// Разрушаем приложение
+	app()->destroy();
+	
+	// Деинициализируем SDL
 	SDL_Quit();
 	
+	// Завершаем основной поток процесса
 	return EXIT_SUCCESS;
 }
