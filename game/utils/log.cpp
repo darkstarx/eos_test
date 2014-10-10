@@ -27,7 +27,7 @@ namespace utils
 	: m_level(level)
 	, m_oss(new ostringstream)
 	{
-		*m_oss << (file ? base_name(file) : "unknown");
+		*m_oss << "[" << (file ? base_name(file) : "unknown");
 		if (line) *m_oss << ':' << line;
 		*m_oss << "] ";
 	}
@@ -56,15 +56,21 @@ namespace utils
 	
 	
 	
-	const char * posix_error_string()
+	std::string posix_error_string()
 	{
 		return posix_error_string(errno);
 	}
 	
 	
-	const char * posix_error_string(int errcode)
+	std::string posix_error_string(int errcode)
 	{
-		return strerror(errcode);
+#ifdef _WIN32
+		char buff[255];
+		strerror_s(buff, 255, errcode);
+		return std::string(buff);
+#else
+		return std::string(strerror(errcode));
+#endif
 	}
 	
 }

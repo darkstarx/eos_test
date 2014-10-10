@@ -2,24 +2,23 @@
 #define APPLICATION_HPP
 
 #include <graphics/types.hpp>
-#include <graphics/Renderer.hpp>
 #include <graphics/events.hpp>
 
 
 class Application
 {
 public:
+	Application(const Application& root) = delete;
+	
+	Application& operator=(const Application&) = delete;
+	
 	static void create();
 	
 	static void destroy();
 	
-	inline static Application* instance() { return m_instance; }
+	inline static bool alive() { return m_instance != 0; }
 	
-	void create_renderer();
-	
-	void destroy_renderer();
-	
-	inline graphics::Renderer* renderer() { return m_renderer; }
+	inline static Application& instance() { return *m_instance; }
 	
 	/** @brief Таймер приложения
 	 * Метод вызывается раз в 60 секунд в основном потоке приложения, позволяет выполнять
@@ -63,14 +62,20 @@ public:
 	
 private:
 	static Application* m_instance;
-	graphics::Renderer* m_renderer;
+	bool m_paused;					///< Признак приостановки работы приложения
+	bool m_stopped;					///< Признак остановки работы приложения
 	
 	Application();
 	
 	~Application();
 };
 
+inline void app_create() { Application::create(); }
 
-inline Application * app() { return Application::instance(); }
+inline void app_destroy() { Application::destroy(); }
+
+inline bool app_alive() { return Application::alive(); }
+
+inline Application& app() { return Application::instance(); }
 
 #endif // APPLICATION_HPP

@@ -48,6 +48,7 @@ public class EOSGLSurfaceView extends GLSurfaceView {
 		setPreserveEGLContextOnPause(true);
 		setEGLConfigChooser(8, 8, 8, 8, 0, 0);
 		setEGLContextFactory(new ContextFactory());
+		
 		m_renderer = new EOSGLRenderer();
 		setRenderer(m_renderer);
 		setRenderMode(RENDERMODE_WHEN_DIRTY);
@@ -127,6 +128,7 @@ public class EOSGLSurfaceView extends GLSurfaceView {
 			final int EGL_CONTEXT_CLIENT_VERSION = 0x3098;
 			final int[] attrib_list = { EGL_CONTEXT_CLIENT_VERSION, GL_ES_VERSION, EGL10.EGL_NONE };
 			final EGLContext context = egl.eglCreateContext(display, eglConfig, EGL10.EGL_NO_CONTEXT, attrib_list);
+			nativeCreateRenderer();
 			return context;
 		}
 		
@@ -138,7 +140,7 @@ public class EOSGLSurfaceView extends GLSurfaceView {
 	}
 	
 	
-	public static native void nativeCreateRenderer();
+	private static native void nativeCreateRenderer();
 	private static native void nativeDestroyRenderer();
 	private static native void nativeOnTick();
 	private static native void nativeOnTouchEvent(final int touch_action, final float x, final float y);

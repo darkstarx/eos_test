@@ -21,7 +21,7 @@ namespace utils
 		GetLocalTime(&tm);
 		{
 			char buff[40];
-			sprintf(buff, "%.2d:%.2d:%.2d.%.6ld  %d %d %c ",
+			sprintf_s(buff, "%.2d:%.2d:%.2d.%.6ld  %d %d %c ",
 				tm.wHour, tm.wMinute, tm.wSecond, tm.wMilliseconds,
 				GetCurrentProcessId(), GetCurrentThreadId(), level_char());
 			stream << buff;

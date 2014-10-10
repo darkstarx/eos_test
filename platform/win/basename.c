@@ -48,21 +48,19 @@ __cdecl char *basename( char *path )
 		 * in which to create a wide character reference copy of path
 		 */
 		wchar_t * refcopy, * refpath;
-		len = mbstowcs( NULL, path, 0 );
-		refcopy = malloc((1 + len) * sizeof(wchar_t));
+		mbstowcs_s(&len, NULL, 0, path, 0);
+		refcopy = malloc(len * sizeof(wchar_t));
 		
 		/* create the wide character reference copy of path,
 		 * and step over the drive designator, if present ...
 		 */
 		refpath = refcopy;
-		if( ((len = mbstowcs( refpath, path, len )) > 1) && (refpath[1] == L':') )
+		mbstowcs_s(&len, refpath, len, path, _TRUNCATE);
+		if( (len > 1) && (refpath[1] == L':') )
 		{
 			/* FIXME: maybe should confirm *refpath is a valid drive designator */
 			refpath += 2;
 		}
-		
-		/* ensure that our wide character reference path is NUL terminated */
-		refcopy[ len ] = L'\0';
 		
 		/* check again, just to ensure we still have a non-empty path name ... */
 		if( *refpath )
@@ -104,11 +102,11 @@ __cdecl char *basename( char *path )
 				* the multibyte character domain, and skip over the dirname,
 				* to return the resolved basename.
 				*/
-				if( (len = wcstombs( path, refcopy, len )) != (size_t)(-1) )
-					path[ len ] = '\0';
+				wcstombs_s(&len, path, len, refcopy, _TRUNCATE);
 				*refname = L'\0';
-				if( (len = wcstombs( NULL, refcopy, 0 )) != (size_t)(-1) )
-					path += len;
+				wcstombs_s(&len, NULL, 0, refcopy, 0);
+				if( len != (size_t)(-1) )
+					path += len - 1;
 			}
 			else
 			{
@@ -116,8 +114,11 @@ __cdecl char *basename( char *path )
 				* transforming from wide char to multibyte char domain, and
 				* returning it in our own buffer.
 				*/
-				retfail = realloc( retfail, len = 1 + wcstombs( NULL, L"/", 0 ));
-				wcstombs( path = retfail, L"/", len );
+				wcstombs_s(&len, NULL, 0, L"/", 0);
+				retfail = realloc( retfail, len );
+				size_t tmp_l;
+				path = retfail;
+				wcstombs_s(&tmp_l, path, len, L"/", _TRUNCATE);
 			}
 
 			/* restore the caller's locale, clean up, and return the result */
@@ -139,8 +140,10 @@ __cdecl char *basename( char *path )
 	 * to the multibyte char domain, just in case the caller trashed it
 	 * after a previous call.
 	 */
-	retfail = realloc( retfail, len = 1 + wcstombs( NULL, L".", 0 ));
-	wcstombs( retfail, L".", len );
+	wcstombs_s(&len, NULL, 0, L".", 0);
+	retfail = realloc( retfail, len );
+	size_t tmp_l;
+	wcstombs_s(&tmp_l, retfail, len, L".", _TRUNCATE);
 	
 	/* restore the caller's locale, clean up, and return the result */
 	setlocale( LC_CTYPE, locale );

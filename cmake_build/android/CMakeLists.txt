@@ -5,35 +5,32 @@ project(eos_client)
 set(PROJECT_DIR ${CMAKE_SOURCE_DIR}/../..)
 # Android project path
 set(ANDROID_DIR ${PROJECT_DIR}/platform/android)
-# JNI path
-set(JNI_DIR ${ANDROID_DIR}/jni)
 
 message(STATUS "ABI: ${ANDROID_ABI}")
 
 # Point to our own cmake modules
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_DIR}/cmake_modules)
 
-file(GLOB SRC_JNI ${JNI_DIR}/*.hpp ${JNI_DIR}/*.cpp ${ANDROID_DIR}/cpp/*.hpp ${ANDROID_DIR}/cpp/*.cpp)
-file(GLOB SRC_GAME ${PROJECT_DIR}/game/*.hpp ${PROJECT_DIR}/game/*.cpp)
-file(GLOB SRC_GAME_GRAPHICS ${PROJECT_DIR}/game/graphics/*.hpp ${PROJECT_DIR}/game/graphics/*.cpp)
-file(GLOB SRC_GAME_UTILS ${PROJECT_DIR}/game/utils/*.hpp ${PROJECT_DIR}/game/utils/*.cpp)
+file(GLOB_RECURSE SRC_JNI ${ANDROID_DIR}/jni/*.hpp ${ANDROID_DIR}/jni/*.cpp ${ANDROID_DIR}/cpp/*.hpp ${ANDROID_DIR}/cpp/*.cpp)
+file(GLOB_RECURSE SRC_GAME ${PROJECT_DIR}/game/*.hpp ${PROJECT_DIR}/game/*.cpp)
 
 set(SOURCE_FILES
 	${SRC_JNI}
 	${SRC_GAME}
-	${SRC_GAME_GRAPHICS}
-	${SRC_GAME_UTILS}
 )
 
 
 include_directories(
 	${PROJECT_DIR}/game
+	${ANDROID_DIR}/jni
 	${ANDROID_DIR}/cpp
+	${PROJECT_DIR}/lib/glm
 )
 
 set(EXT_LIBRARIES
 	GLESv2
 	log
+	android
 )
 
 include(${PROJECT_DIR}/cmake_build/common/game.cmake)
@@ -46,6 +43,9 @@ target_link_libraries(${PROJECT_NAME} ${EXT_LIBRARIES})
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND mkdir -p ${ANDROID_DIR}/libs/${ANDROID_ABI}/)
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND cp ${LIBRARY_OUTPUT_PATH}/lib${PROJECT_NAME}.so ${ANDROID_DIR}/libs/${ANDROID_ABI}/)
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_STRIP} ${ANDROID_DIR}/libs/${ANDROID_ABI}/lib${PROJECT_NAME}.so)
+# Copy assets
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND rm -rf ${ANDROID_DIR}/assets/*)
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND cp -rf ${PROJECT_DIR}/assets/* ${ANDROID_DIR}/assets/)
 
 # Prepare make clean
 list(APPEND CLEAN_FILES

@@ -4,28 +4,35 @@ project(eos_client)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Project dir path
-set(PROJECT_DIR ${CMAKE_SOURCE_DIR}/../../)
+set(PROJECT_DIR ${CMAKE_SOURCE_DIR}/../..)
 # Windows project path
 set(WINDOWS_DIR ${PROJECT_DIR}/platform/win)
+# Common desktop platform files directory
+set(DESKTOP_DIR ${PROJECT_DIR}/platform/desktop)
 
 # Point to our own cmake modules
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_DIR}/cmake_modules)
 
 file(GLOB SRC_PLATFORM ${PROJECT_DIR}/platform/win/*.h ${PROJECT_DIR}/platform/win/*.c ${PROJECT_DIR}/platform/win/*.hpp ${PROJECT_DIR}/platform/win/*.cpp)
+file(GLOB SRC_DESKTOP ${PROJECT_DIR}/platform/desktop/*.hpp ${PROJECT_DIR}/platform/desktop/*.cpp)
 file(GLOB SRC_GAME ${PROJECT_DIR}/game/*.hpp ${PROJECT_DIR}/game/*.cpp)
 file(GLOB SRC_GAME_GRAPHICS ${PROJECT_DIR}/game/graphics/*.hpp ${PROJECT_DIR}/game/graphics/*.cpp)
+file(GLOB SRC_GAME_RESOURCES ${PROJECT_DIR}/game/resources/*.hpp ${PROJECT_DIR}/game/resources/*.cpp)
 file(GLOB SRC_GAME_UTILS ${PROJECT_DIR}/game/utils/*.hpp ${PROJECT_DIR}/game/utils/*.cpp)
 
 set(SOURCE_FILES
 	${SRC_PLATFORM}
+	${SRC_DESKTOP}
 	${SRC_GAME}
 	${SRC_GAME_GRAPHICS}
+	${SRC_GAME_RESOURCES}
 	${SRC_GAME_UTILS}
 )
 
-source_group("platform" FILES ${SRC_PLATFORM})
+source_group("platform" FILES ${SRC_PLATFORM} ${SRC_DESKTOP})
 source_group("game" FILES ${SRC_GAME})
 source_group("game\\graphics" FILES ${SRC_GAME_GRAPHICS})
+source_group("game\\resources" FILES ${SRC_GAME_RESOURCES})
 source_group("game\\utils" FILES ${SRC_GAME_UTILS})
 
 # Find OpenGL
@@ -59,9 +66,11 @@ set(SDL_LIBRARIES
 
 include_directories(
 	${WINDOWS_DIR}
+	${DESKTOP_DIR}
 	${PROJECT_DIR}
 	${PROJECT_DIR}/game
 	${PROJECT_DIR}/include/win
+	${PROJECT_DIR}/lib/glm
 )
 
 set(EXT_LIBRARIES
@@ -77,9 +86,19 @@ list(APPEND GAME_DEFINES
 )
 
 add_executable(${PROJECT_NAME} WIN32 ${SOURCE_FILES})
-
 target_link_libraries(${PROJECT_NAME} ${EXT_LIBRARIES})
 
+# Copy built binaries and resources for them into the `bin` directory
+string(REPLACE "/" "\\" PROJECT_DIR_WIN ${PROJECT_DIR})
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND xcopy ${PROJECT_DIR_WIN}\\resources\\* $(TargetDir)resources\\ /e/q/r/y)
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND xcopy ${PROJECT_DIR_WIN}\\assets\\* $(TargetDir)assets\\ /e/q/r/y)
+
+# Resources and assets paths
+list(APPEND GAME_DEFINES
+	RESOURCES_PATH="resources\\"
+	ASSETS_PATH="assets\\"
+)
+# Set c++ definitions
 set_target_properties(${PROJECT_NAME}
 	PROPERTIES
 	COMPILE_DEFINITIONS "${GAME_DEFINES}"

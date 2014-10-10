@@ -28,7 +28,11 @@ namespace utils
 	{
 		char path[MAX_PATH + 1];
 		path[MAX_PATH] = 0;
+#ifdef _WIN32
+		strncpy_s(path, _path, MAX_PATH);
+#else
 		strncpy(path, _path, MAX_PATH);
+#endif
 		return std::string(basename(path));
 	}
 	

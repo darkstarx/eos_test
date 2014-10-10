@@ -27,7 +27,6 @@ public class EOSGLRenderer implements EOSGLSurfaceView.Renderer {
 
 	@Override
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-		EOSGLSurfaceView.nativeCreateRenderer();
 	}
 
     // Нативные методы - все выполняются из OpenGL потока!

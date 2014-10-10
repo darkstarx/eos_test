@@ -12,6 +12,7 @@ import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
+import android.content.res.AssetManager;
 
 
 public class EOSActivity extends Activity {
@@ -23,6 +24,10 @@ public class EOSActivity extends Activity {
 	
 	public static EOSActivity getInstance() {
 		return m_instance;
+	}
+	
+	public static AssetManager getAssetManager() {
+		return m_instance.getAssets();
 	}
 	
 	@Override
@@ -66,8 +71,8 @@ public class EOSActivity extends Activity {
 	@Override
 	protected void onPause()
 	{
-		m_glView.onPause();
 		nativeOnPause();
+		m_glView.onPause();
 		super.onPause();
 	}
 	
@@ -75,18 +80,18 @@ public class EOSActivity extends Activity {
 	protected void onResume()
 	{
 		super.onResume();
-		nativeOnResume();
 		m_glView.onResume();
+		nativeOnResume();
 	}
 	
 	@Override
 	protected void onDestroy()
 	{
-		nativeOnDestroy();
-		
 		m_glView.setVisibility(View.INVISIBLE);
 		m_glView = null;
 		m_layout = null;
+		
+		nativeOnDestroy();
 		
 		m_instance = null;
 		super.onDestroy();

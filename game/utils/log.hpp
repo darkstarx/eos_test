@@ -46,8 +46,8 @@ namespace utils
 	
 	struct Voidify { inline void operator &(const std::ostream&) const { } };
 	
-	const char * posix_error_string();
-	const char * posix_error_string(int errcode);
+	std::string posix_error_string();
+	std::string posix_error_string(int errcode);
 	
 }
 

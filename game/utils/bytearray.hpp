@@ -1,5 +1,8 @@
 #ifndef UTILS_BYTEARRAY_H
 #define UTILS_BYTEARRAY_H
+#include <stdlib.h>
+#include <cstdlib>
+#include <cstring>
 
 
 namespace utils

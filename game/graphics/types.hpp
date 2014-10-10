@@ -7,6 +7,14 @@
 namespace graphics
 {
 	
+	/** @brief Тип шейдерной программы
+	 */
+	enum shader_program_t
+	{
+		sp_simple = 0
+	};
+	
+	
 	struct position_t
 	{
 		GLfloat x;
@@ -16,6 +24,7 @@ namespace graphics
 		~position_t() {}
 		inline bool operator !() const { return x == 0 && y == 0; }
 	};
+	
 	
 	struct dimension_t
 	{
@@ -27,6 +36,7 @@ namespace graphics
 		inline bool operator !() const { return w == 0 && h == 0; }
 		
 	};
+	
 	
 	struct rectangle_t : public position_t, public dimension_t
 	{
@@ -43,6 +53,30 @@ namespace graphics
 		inline const dimension_t& dimension() const { return *this; }
 		inline bool operator !() const { return x == 0 && y == 0 && w == 0 && h == 0; }
 	};
+	
+	
+	struct color_t
+	{
+		GLfloat r;
+		GLfloat g;
+		GLfloat b;
+		GLfloat a;
+		color_t() : r(0), g(0), b(0), a(1) {}
+		explicit color_t(GLfloat r, GLfloat g, GLfloat b, GLfloat a = 1) : r(r), g(g), b(b), a(a) {}
+		~color_t() {}
+		
+		static inline color_t f_dw(GLuint hex)
+		{ return f_ub((hex & 0x00ff0000) >> 16, (hex & 0x0000ff00) >> 8, hex & 0x000000ff, (hex & 0xff000000) >> 24); }
+		
+		static inline color_t f_ub(GLubyte r, GLubyte g, GLubyte b, GLubyte a = 255)
+		{ return color_t((GLfloat)r / 255.0f, (GLfloat)g / 255.0f, (GLfloat)b / 255.0f, (GLfloat)a / 255.0f); }
+	};
+	
+	inline bool operator ==(const color_t& lhs, const color_t& rhs)
+	{ return lhs.r == rhs.r && lhs.g == rhs.g && lhs.b == rhs.b && lhs.a == rhs.a; }
+	
+	inline bool operator !=(const color_t& lhs, const color_t& rhs)
+	{ return !(lhs==rhs); }
 	
 }
 

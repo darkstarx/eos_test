@@ -1,28 +1,38 @@
 #include <graphics/Renderer.hpp>
 #include <graphics/gl.hpp>
+#include <graphics/Context.hpp>
+#include <graphics/ShaderProgram.hpp>
+#include <resources/FileSystem.hpp>
 #include <utils/log.hpp>
 
 
-namespace graphics {
+namespace graphics
+{
 	
-	Renderer::Renderer()
-	: m_valid(false)
-	, m_xr(0)
-	, m_yr(0)
-	, m_zr(0)
+	Renderer *Renderer::m_instance = NULL;
+	
+	
+	void Renderer::create()
 	{
-		
+		ASSERT(!m_instance);
+		m_instance = new Renderer();
 	}
 	
 	
-	Renderer::~Renderer()
+	void Renderer::destroy()
 	{
-		
+		ASSERT(m_instance);
+		delete m_instance;
+		m_instance = NULL;
 	}
 	
 	
 	void Renderer::on_surface_changed(int width, int height, bool is_tablet)
 	{
+		// Загружаем шейдеры
+		load_shaders();
+		
+		// Настраиваем отображение сцены
 		glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
 // 		glClearDepth(1.0);
 // 		glDepthFunc(GL_LESS);
@@ -50,6 +60,32 @@ namespace graphics {
 		
 		// Сцена отрисована
 // 		m_valid = true;
+	}
+	
+	
+	void Renderer::load_shaders()
+	{
+		// Простая шейдерная программа
+		{
+			utils::bytearray src_vert;
+			utils::bytearray src_frag;
+			const std::string src_vert_path("simple.vsh");
+			const std::string src_frag_path("simple.fsh");
+			if (!resources().load_asset(src_vert_path, src_vert))
+				LOG(FATAL) << "Ошибка загрузки шейдера " << src_vert_path;
+			if (!resources().load_asset(src_frag_path, src_frag))
+				LOG(FATAL) << "Ошибка загрузки шейдера " << src_frag_path;
+			
+			ShaderProgramSPtr simple_program(new ShaderProgram(src_vert, src_frag));
+			m_shader_programs[sp_simple] = simple_program;
+		}
+		
+	}
+	
+	
+	void Renderer::release_shaders()
+	{
+		m_shader_programs.clear();
 	}
 	
 	
@@ -102,6 +138,24 @@ namespace graphics {
 // 		glVertex3f( 1.0f, -1.0f, -1.0f);    // Нижний правый
 // 		
 // 		glEnd();                            // Закончили квадраты   
+	}
+	
+	
+	Renderer::Renderer()
+	: m_valid(false)
+	, m_xr(0)
+	, m_yr(0)
+	, m_zr(0)
+	{
+		ctx_create();
+		LOG(INFO) << "Renderer created";
+	}
+	
+	
+	Renderer::~Renderer()
+	{
+		ctx_destroy();
+		LOG(INFO) << "Renderer destroyed";
 	}
 	
 }
