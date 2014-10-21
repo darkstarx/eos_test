@@ -44,8 +44,8 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND mkdir -p ${ANDROID_
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND cp ${LIBRARY_OUTPUT_PATH}/lib${PROJECT_NAME}.so ${ANDROID_DIR}/libs/${ANDROID_ABI}/)
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_STRIP} ${ANDROID_DIR}/libs/${ANDROID_ABI}/lib${PROJECT_NAME}.so)
 # Copy assets
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND rm -rf ${ANDROID_DIR}/assets/*)
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND cp -rf ${PROJECT_DIR}/assets/* ${ANDROID_DIR}/assets/)
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND rm -rf ${ANDROID_DIR}/assets/)
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND cp -rf ${PROJECT_DIR}/assets/ ${ANDROID_DIR}/)
 
 # Prepare make clean
 list(APPEND CLEAN_FILES

@@ -1,4 +1,6 @@
 #include <Application.hpp>
+#include <graphics/Renderer.hpp>
+#include "graphics/GObject.hpp"
 #include <utils/log.hpp>
 #include <resources/FileSystem.hpp>
 
@@ -23,6 +25,12 @@ void Application::destroy()
 
 void Application::tick()
 {
+	if (!renderer_alive()) return;
+	graphics::GObjectSPtr root_obj = renderer().root_object();
+	if (!root_obj) return;
+	graphics::rotation_t rot = root_obj->rotation();
+	rot.angle_y += 0.5f;
+	root_obj->set_rotation(rot);
 }
 
 

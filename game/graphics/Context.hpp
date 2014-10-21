@@ -11,7 +11,7 @@ namespace graphics
 	class Context
 	{
 	public:
-		Context(const Context& root) = delete;
+		Context(const Context&) = delete;
 		
 		Context& operator=(const Context&) = delete;
 		

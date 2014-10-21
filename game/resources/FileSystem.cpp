@@ -1,20 +1,25 @@
 #include <resources/FileSystem.hpp>
 #include <utils/log.hpp>
+#include <errno.h>
 
 #ifndef RESOURCES_PATH
 #ifndef ANDROID
 	// В андроиде расположение ресурсов определяется динамически при запуске приложения
+#ifndef _WIN32
 	#error "Необходимо определить расположение ресурсов RESOURCES_PATH"
+#endif
 #endif //ANDROID
-#define RESOURCES_PATH "/resources"
+#define RESOURCES_PATH "resources/"
 #endif
 
 #ifndef ASSETS_PATH
 #ifndef ANDROID
-	// В андроиде расположение ассетов не требуется, так как используется ассетс-менеджер
+#ifndef _WIN32
+// В андроиде расположение ассетов не требуется, так как используется ассетс-менеджер
 	#error "Необходимо определить расположение ресурсов ASSETS_PATH"
+#endif
 #endif //ANDROID
-#define ASSETS_PATH "/assets"
+#define ASSETS_PATH "assets/"
 #endif
 
 
@@ -62,16 +67,15 @@ bool FileSystem::load_from_file(const std::string& path, utils::bytearray& data)
 {
 	FILE *file;
 #ifdef _WIN32
-	if (fopen_s(&file, path.c_str(), "rb")) {
-		return false;
-	}
+	fopen_s(&file, path.c_str(), "rb");
 #else
 	file = fopen(path.c_str(), "rb");
+#endif
 	if (!file) {
+		DLOG(ERR) << "Не удалось загрузить файл, код ошибки: " << errno;
 		return false;
 	}
-#endif
-	
+
 	fseek(file, 0, SEEK_END);
 	const long int filesize = ftell(file);
 	utils::bytearray buff(filesize);
@@ -94,7 +98,7 @@ bool FileSystem::save_to_file(const std::string& path, utils::bytearray& data)
 {
 	FILE *file;
 #ifdef _WIN32
-	if (fopen_s(&file, path.c_str(), "wb")) {
+	if (!fopen_s(&file, path.c_str(), "wb")) {
 		return false;
 	}
 #else

@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <utils/log.hpp>
 #include <utils/bytearray.hpp>
 
 
@@ -15,7 +16,7 @@ class FileSystemDestroyer
 {
 public:
 	~FileSystemDestroyer();
-	inline void init(FileSystem *instance) { m_instance = instance; }
+	inline void init(FileSystem *instance) { ASSERT(!m_instance); m_instance = instance; }
 private:
 	FileSystem *m_instance;
 };
@@ -31,7 +32,7 @@ private:
 	~FileSystem();
 	
 public:
-	FileSystem(const FileSystem& root) = delete;
+	FileSystem(const FileSystem&) = delete;
 	
 	FileSystem& operator=(const FileSystem&) = delete;
 	

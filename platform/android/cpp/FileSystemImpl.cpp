@@ -35,13 +35,17 @@ bool FileSystem::load_asset(const std::string& path, utils::bytearray& data)
 	ASSERT(mgr);
 	
 	AAsset* asset = AAssetManager_open(mgr, path.c_str(), AASSET_MODE_STREAMING);
-	if (!asset) return false;
+	if (!asset) {
+		LOG(ERR) << "Не удалось открыть файл " << path;
+		return false;
+	}
 	
 	const long int filesize = AAsset_getLength(asset);
 	utils::bytearray buff(filesize);
 	if (AAsset_read(asset, buff.get(), buff.size()) < 0)
 	{
 		AAsset_close(asset);
+		LOG(ERR) << "Не удалось прочитать файл " << path;
 		return false;
 	}
 	else

@@ -9,7 +9,7 @@
 namespace graphics
 {
 	
-	/** @brief Отрисовщик сцены
+	/** \brief Отрисовщик сцены
 	 */
 	class Renderer
 	{
@@ -31,32 +31,42 @@ namespace graphics
 		
 		inline bool is_valid() { return m_valid; }
 		
-		/** @brief Обработать смену GL-поверхности
-		 * @param width Ширина GL-поверхности.
-		 * @param height Высота GL-поверхности.
-		 * @param is_tablet Признак того, что устройство является планшетом (иначе телефон).
+		inline GObjectSPtr root_object() { return m_root_object; }
+		
+		/** \brief Обработать смену GL-поверхности
+		 * NOTE Выполняется в графическом потоке.
+		 * \param width Ширина GL-поверхности.
+		 * \param height Высота GL-поверхности.
+		 * \param is_tablet Признак того, что устройство является планшетом (иначе телефон).
 		 */
 		void on_surface_changed(int width, int height, bool is_tablet);
 		
-		/** @brief Обработать необходимость перерисовать кадр
+		/** \brief Обработать необходимость перерисовать кадр
+		 * NOTE Выполняется в графическом потоке.
 		 */
 		void on_draw_frame();
+		
+		/** \brief Получить шейдерную программу
+		 */
+		ShaderProgramSPtr get_program(shader_program_t program_type);
 		
 	private:
 		static Renderer* m_instance;
 		bool m_valid;							///< Признак актуальности текущего кадра
 		shader_programs_t m_shader_programs;	///< Шейдерные программы
-		float m_xr, m_yr, m_zr;
+		GObjectSPtr m_root_object;
 		
 		Renderer();
 		
 		~Renderer();
 		
-		/** @brief Загрузить шейдеры и подготовить шейдерные программы
+		/** \brief Загрузить шейдеры и подготовить шейдерные программы
+		 * NOTE Выполняется в графическом потоке.
 		 */
 		void load_shaders();
 		
-		/** @brief Удалить все шейдеры и шейдерные программы
+		/** \brief Удалить все шейдеры и шейдерные программы
+		 * NOTE Выполняется в графическом потоке.
 		 */
 		void release_shaders();
 		

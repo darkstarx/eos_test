@@ -90,13 +90,13 @@ target_link_libraries(${PROJECT_NAME} ${EXT_LIBRARIES})
 
 # Copy built binaries and resources for them into the `bin` directory
 string(REPLACE "/" "\\" PROJECT_DIR_WIN ${PROJECT_DIR})
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND xcopy ${PROJECT_DIR_WIN}\\resources\\* $(TargetDir)resources\\ /e/q/r/y)
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND xcopy ${PROJECT_DIR_WIN}\\assets\\* $(TargetDir)assets\\ /e/q/r/y)
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND xcopy ${PROJECT_DIR_WIN}\\resources\\* $(ProjectDir)resources\\ /e/q/r/y)
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND xcopy ${PROJECT_DIR_WIN}\\assets\\* $(ProjectDir)assets\\ /e/q/r/y)
 
 # Resources and assets paths
 list(APPEND GAME_DEFINES
-	RESOURCES_PATH="resources\\"
-	ASSETS_PATH="assets\\"
+	RESOURCES_PATH="resources\\\\"
+	ASSETS_PATH="assets\\\\"
 )
 # Set c++ definitions
 set_target_properties(${PROJECT_NAME}

@@ -61,6 +61,7 @@ namespace utils
 #define PCHECK(cond) CHECK(cond) << utils::posix_error_string() << ": "
 #define PCHECK2(cond, errsrc) CHECK(cond) << utils::posix_error_string(errsrc) << ": "
 
+#define LOG_VOIDIFY() true ? (void)0 : ::utils::Voidify() & ::utils::Log(FATAL, __FILE__, __LINE__).stream()
 
 #ifndef NDEBUG
 	
@@ -72,11 +73,11 @@ namespace utils
 	
 #else //NDEBUG
 	
-	#define DCHECK(cond)
-	#define ASSERT(cond)
+	#define DCHECK(cond) LOG_VOIDIFY()
+	#define ASSERT(cond) LOG_VOIDIFY()
 	
-	#define DLOG(level)
-	#define DLOG_IF(level, cond)
+	#define DLOG(level) LOG_VOIDIFY()
+	#define DLOG_IF(level, cond) LOG_VOIDIFY()
 	
 #endif //NDEBUG
 
