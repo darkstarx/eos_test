@@ -22,18 +22,26 @@ namespace utils
 	
 	void Log::log_to_syslog(const std::string &str) const
 	{
-		__android_log_write(m_level, m_tag, str.c_str());
+		struct timeval tvnow;
+		gettimeofday(&tvnow, NULL);
+		struct tm tmnow;
+		time_t tv_sec_tmp = tvnow.tv_sec;
+		localtime_r(&tv_sec_tmp, &tmnow);
+		{
+			char buff[30];
+			sprintf(buff, "%.2d:%.2d:%.2d.%.6ld  %d ",
+				tmnow.tm_hour, tmnow.tm_min, tmnow.tm_sec, static_cast<long>(tvnow.tv_usec),
+				gettid()
+			);
+			std::string msg(buff);
+			__android_log_write(m_level, m_tag, msg.append(str).c_str());
+		}
 		
 		if (android_log_file) {
-			struct timeval tvnow;
-			gettimeofday(&tvnow, NULL);
-			struct tm tmnow;
-			time_t tv_sec_tmp = tvnow.tv_sec;
-			localtime_r(&tv_sec_tmp, &tmnow);
 			fprintf(
 				android_log_file,
 				"%.2d-%.2d %.2d:%.2d:%.2d.%.6ld %d %d %c %s\n",
-				tmnow.tm_mon+1, tmnow.tm_mday, tmnow.tm_hour, tmnow.tm_min, tmnow.tm_sec,
+				tmnow.tm_mon + 1, tmnow.tm_mday, tmnow.tm_hour, tmnow.tm_min, tmnow.tm_sec,
 				static_cast<long>(tvnow.tv_usec),
 				getpid(),
 				gettid(),

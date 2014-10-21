@@ -18,12 +18,12 @@ void MainWindow::init_SDL_graphics()
 	{
 		LOG(FATAL) << "Unable to init SDL, error: " << SDL_GetError();
 	}
-
+	
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
-
+	
 	static const std::string app_name = "eos_test";
 	window = SDL_CreateWindow(
 		app_name.c_str(),
@@ -31,8 +31,8 @@ void MainWindow::init_SDL_graphics()
 		SDL_WINDOWPOS_CENTERED,
 		WINDOW_WIDTH, WINDOW_HEIGHT,
 		SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL
-		);
-
+	);
+	
 	if (window == NULL)
 	{
 		LOG(FATAL) << "Unable to create window, error: " << SDL_GetError();
@@ -44,10 +44,11 @@ void MainWindow::graphics_worker()
 {
 	// Создаем GL-контекст
 	SDL_GLContext glcontext = SDL_GL_CreateContext(window);
-
+	// Создаем рендерер
+	renderer_create();
 	// Сообщаем рендереру о том, что поверхность сформирована
 	renderer().on_surface_changed(WINDOW_WIDTH, WINDOW_HEIGHT, true);
-
+	
 	// Для контроля fps определяем максимальный fps = 60
 	const std::chrono::microseconds normal_duration(static_cast<int>(TICK_INTERVAL * 1000));
 	std::chrono::time_point<std::chrono::system_clock> start, end;
@@ -68,6 +69,8 @@ void MainWindow::graphics_worker()
 		if (duration < normal_duration)
 			std::this_thread::sleep_for(normal_duration - duration);
 	}
+	// Разрушаем рендерер
+	renderer_destroy();
 	// Графический поток останавливается, освобождаем GL-контекст
 	SDL_GL_DeleteContext(glcontext);
 }
@@ -94,11 +97,11 @@ int MainWindow::create_window()
 {
 	// Создаем приложение
 	app_create();
-
+	
 	// Создаем графическое окно
 	init_SDL_graphics();
 	app().start();
-
+	
 	// Время последнего тика
 	std::chrono::time_point<std::chrono::system_clock> last_tick_time = std::chrono::system_clock::now();
 	// Запускаем цикл обработки сообщений от окна
@@ -135,7 +138,6 @@ int MainWindow::create_window()
 							break;
 						case SDL_WINDOWEVENT_SHOWN:
 						case SDL_WINDOWEVENT_RESTORED:
-							if (!renderer_alive()) renderer_create();
 							start_rendering();
 							app().resume();
 							break;
@@ -156,21 +158,20 @@ int MainWindow::create_window()
 			app().tick();
 		}
 	}
-
+	
 	// Приложение останавливается
 	app().pause();
 	app().stop();
-
+	
 	// Останавливаем графический поток и разрушаем рендерер
 	if (render_working) stop_rendering();
-	renderer_destroy();
-
+	
 	// Разрушаем приложение
 	app_destroy();
-
+	
 	// Деинициализируем SDL
 	SDL_Quit();
-
+	
 	// Завершаем основной поток процесса
 	return 0;
 }

@@ -29,7 +29,7 @@ public class EOSGLRenderer implements EOSGLSurfaceView.Renderer {
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 	}
 
-    // Нативные методы - все выполняются из OpenGL потока!
+	// Нативные методы - все выполняются из OpenGL потока!
 	private static native void nativeOnSurfaceChanged(int width, int height, boolean is_tablet);
 	private static native void nativeOnDrawFrame();
 	public static native boolean nativeIsValid();

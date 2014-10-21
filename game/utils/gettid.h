@@ -20,21 +20,28 @@ extern "C" {
 #endif//__cplusplus
 
 
-#ifndef linux
+#if defined _WIN32
 
 inline pid_t gettid(void)
 {
-	#ifdef  __APPLE__
-	return syscall(SYS_thread_selfid);
-	#endif//__APPLE__
-	#ifdef  _WIN32
 	return GetCurrentThreadId();
-	#endif//_WIN32
 }
 
-#else //linux
+#elif defined __APPLE__
 
-#ifndef ANDROID
+inline pid_t gettid(void)
+{
+	return syscall(SYS_thread_selfid);
+}
+
+#elif defined ANDROID
+
+inline pid_t gettid(void)
+{
+	return syscall(__NR_gettid);
+}
+
+#else
 
 inline pid_t gettid(void)
 {
@@ -43,7 +50,6 @@ inline pid_t gettid(void)
 
 #endif
 
-#endif//linux
 
 #ifdef  __cplusplus
 }
