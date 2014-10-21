@@ -7,7 +7,7 @@
 namespace graphics
 {
 	
-	/** @brief Тип шейдерной программы
+	/** \brief Тип шейдерной программы
 	 */
 	enum shader_program_t
 	{
@@ -19,23 +19,39 @@ namespace graphics
 	{
 		GLfloat x;
 		GLfloat y;
-		position_t() : x(0), y(0) {}
-		explicit position_t(GLfloat x, GLfloat y) : x(x), y(y) {}
+		GLfloat z;
+		position_t() : x(0.0f), y(0.0f), z(0.0f) {}
+		explicit position_t(GLfloat x, GLfloat y) : x(x), y(y), z(0.0f) {}
+		explicit position_t(GLfloat x, GLfloat y, GLfloat z) : x(x), y(y), z(z) {}
 		~position_t() {}
-		inline bool operator !() const { return x == 0 && y == 0; }
+		inline bool operator !() const { return x == 0.0f && y == 0.0f && z == 0.0f; }
 	};
+	
+	inline bool operator ==(const position_t &lhs, const position_t &rhs)
+	{ return lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z; }
+	
+	inline bool operator !=(const position_t &lhs, const position_t &rhs)
+	{ return !(lhs == rhs); }
 	
 	
 	struct dimension_t
 	{
 		GLfloat w;
 		GLfloat h;
-		dimension_t() : w(0), h(0) {}
-		explicit dimension_t(GLfloat w, GLfloat h) : w(w), h(h) {}
+		GLfloat d;
+		dimension_t() : w(0.0f), h(0.0f), d(0.0f) {}
+		explicit dimension_t(GLfloat w, GLfloat h) : w(w), h(h), d(0.0f) {}
+		explicit dimension_t(GLfloat w, GLfloat h, GLfloat d) : w(w), h(h), d(d) {}
 		~dimension_t() {}
-		inline bool operator !() const { return w == 0 && h == 0; }
+		inline bool operator !() const { return w == 0.0f && h == 0.0f && d == 0.0f; }
 		
 	};
+	
+	inline bool operator ==(const dimension_t &lhs, const dimension_t &rhs)
+	{ return lhs.w == rhs.w && lhs.h == rhs.h && lhs.d == rhs.d; }
+	
+	inline bool operator !=(const dimension_t &lhs, const dimension_t &rhs)
+	{ return !(lhs == rhs); }
 	
 	
 	struct rectangle_t : public position_t, public dimension_t
@@ -45,14 +61,77 @@ namespace graphics
 		explicit rectangle_t(const position_t& pos, GLfloat w, GLfloat h) : position_t(pos), dimension_t(w, h) {}
 		explicit rectangle_t(GLfloat x, GLfloat y, const dimension_t& dim) : position_t(x, y), dimension_t(dim) {}
 		explicit rectangle_t(const position_t& pos, const dimension_t& dim) : position_t(pos), dimension_t(dim) {}
-		explicit rectangle_t(GLfloat x, GLfloat y, const rectangle_t& rect) : position_t(x,y), dimension_t(rect.w, rect.h) {}
 		~rectangle_t() {}
 		inline position_t& position() { return *this; }
 		inline const position_t& position() const { return *this; }
 		inline dimension_t& dimension() { return *this; }
 		inline const dimension_t& dimension() const { return *this; }
-		inline bool operator !() const { return x == 0 && y == 0 && w == 0 && h == 0; }
+		inline bool operator !() const { return x == 0.0f && y == 0.0f && w == 0.0f && h == 0.0f; }
 	};
+	
+	inline bool operator ==(const rectangle_t &lhs, const rectangle_t &rhs)
+	{ return lhs.x == rhs.x && lhs.y == rhs.y && lhs.w == rhs.w && lhs.h == rhs.h; }
+	
+	inline bool operator !=(const rectangle_t &lhs, const rectangle_t &rhs)
+	{ return !(lhs == rhs); }
+	
+	
+	struct box_t : public position_t, public dimension_t
+	{
+		box_t() : position_t(), dimension_t() {}
+		explicit box_t(GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLfloat h, GLfloat d) : position_t(x, y, z), dimension_t(w, h, d) {}
+		explicit box_t(const position_t& pos, GLfloat w, GLfloat h, GLfloat d) : position_t(pos), dimension_t(w, h, d) {}
+		explicit box_t(GLfloat x, GLfloat y, GLfloat z, const dimension_t& dim) : position_t(x, y, z), dimension_t(dim) {}
+		explicit box_t(const position_t& pos, const dimension_t& dim) : position_t(pos), dimension_t(dim) {}
+		~box_t() {}
+		inline position_t& position() { return *this; }
+		inline const position_t& position() const { return *this; }
+		inline dimension_t& dimension() { return *this; }
+		inline const dimension_t& dimension() const { return *this; }
+		inline bool operator !() const { return x == 0.0f && y == 0.0f && z == 0.0f && w == 0.0f && h == 0.0f && d == 0.0f; }
+	};
+	
+	inline bool operator ==(const box_t &lhs, const box_t &rhs)
+	{ return lhs.position() == rhs.position() && lhs.dimension() == rhs.dimension(); }
+	
+	inline bool operator !=(const box_t &lhs, const box_t &rhs)
+	{ return !(lhs == rhs); }
+	
+	
+	struct rotation_t
+	{
+		GLfloat angle_x;
+		GLfloat angle_y;
+		GLfloat angle_z;
+		
+		rotation_t() : angle_x(0.0f), angle_y(0.0f), angle_z(0.0f) {}
+		explicit rotation_t(GLfloat angle_x, GLfloat angle_y, GLfloat angle_z) : angle_x(angle_x), angle_y(angle_y), angle_z(angle_z) {}
+		~rotation_t() {}
+	};
+	
+	inline bool operator ==(const rotation_t &lhs, const rotation_t &rhs)
+	{ return lhs.angle_x == rhs.angle_x && lhs.angle_y == rhs.angle_y && lhs.angle_z == rhs.angle_z; }
+	
+	inline bool operator !=(const rotation_t &lhs, const rotation_t &rhs)
+	{ return !(lhs == rhs); }
+	
+	
+	struct scale_t
+	{
+		GLfloat x;
+		GLfloat y;
+		GLfloat z;
+		
+		scale_t() : x(1.0f), y(1.0f), z(1.0f) {}
+		explicit scale_t(GLfloat x, GLfloat y, GLfloat z) : x(x), y(y), z(z) {}
+		~scale_t() {}
+	};
+	
+	inline bool operator ==(const scale_t &lhs, const scale_t &rhs)
+	{ return lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z; }
+	
+	inline bool operator !=(const scale_t &lhs, const scale_t &rhs)
+	{ return !(lhs == rhs); }
 	
 	
 	struct color_t
@@ -61,7 +140,7 @@ namespace graphics
 		GLfloat g;
 		GLfloat b;
 		GLfloat a;
-		color_t() : r(0), g(0), b(0), a(1) {}
+		color_t() : r(0.0f), g(0.0f), b(0.0f), a(1.0f) {}
 		explicit color_t(GLfloat r, GLfloat g, GLfloat b, GLfloat a = 1) : r(r), g(g), b(b), a(a) {}
 		~color_t() {}
 		

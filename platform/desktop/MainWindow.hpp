@@ -6,8 +6,8 @@
 #include <thread>
 #include <atomic>
 
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 600
+#define WINDOW_WIDTH 1196
+#define WINDOW_HEIGHT 720
 
 
 /** @brief —татический класс главного окна приложени€

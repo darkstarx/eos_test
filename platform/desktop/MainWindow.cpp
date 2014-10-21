@@ -19,11 +19,13 @@ void MainWindow::init_SDL_graphics()
 		LOG(FATAL) << "Unable to init SDL, error: " << SDL_GetError();
 	}
 	
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+	SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
-	
+
 	static const std::string app_name = "eos_test";
 	window = SDL_CreateWindow(
 		app_name.c_str(),
@@ -44,6 +46,17 @@ void MainWindow::graphics_worker()
 {
 	// Создаем GL-контекст
 	SDL_GLContext glcontext = SDL_GL_CreateContext(window);
+	// Проверяем версию OpenGL
+	LOG(INFO) << "OpenGL " << glGetString(GL_VERSION);
+#ifdef _WIN32
+	// Инициализируем GLEW
+	glewExperimental = GL_TRUE;
+	GLenum status = glewInit();
+	if (status != GLEW_OK)
+		LOG(FATAL) << "GLEW Error: " << glewGetErrorString(status);
+#endif
+	// Устанавливаем GL-контекст текущим
+	SDL_GL_MakeCurrent(window, glcontext);
 	// Создаем рендерер
 	renderer_create();
 	// Сообщаем рендереру о том, что поверхность сформирована
@@ -52,6 +65,10 @@ void MainWindow::graphics_worker()
 	// Для контроля fps определяем максимальный fps = 60
 	const std::chrono::microseconds normal_duration(static_cast<int>(TICK_INTERVAL * 1000));
 	std::chrono::time_point<std::chrono::system_clock> start, end;
+#ifndef NDEBUG
+	int frames = 0;
+	std::chrono::time_point<std::chrono::system_clock> check_point = std::chrono::system_clock::now();
+#endif
 	// Выполняем графический цикл, пока приложение не будет остановлено
 	while (render_working)
 	{
@@ -68,6 +85,15 @@ void MainWindow::graphics_worker()
 		// Если на отрисовку ушло меньше normal_duration, ждем следующего тика
 		if (duration < normal_duration)
 			std::this_thread::sleep_for(normal_duration - duration);
+#ifndef NDEBUG
+		++frames;
+		const std::chrono::milliseconds check_time(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - check_point));
+		if (check_time.count() >= 1000) {
+			DLOG(INFO) << "fps: " << frames;
+			frames = 0;
+			check_point = std::chrono::system_clock::now();
+		}
+#endif
 	}
 	// Разрушаем рендерер
 	renderer_destroy();

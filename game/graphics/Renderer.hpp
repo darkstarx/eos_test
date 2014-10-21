@@ -3,13 +3,15 @@
 
 #include <graphics/types.hpp>
 #include <graphics/forwards.hpp>
+#include <utils/spin_lock.hpp>
+#include <Application.hpp>
 #include <map>
 
 
 namespace graphics
 {
 	
-	/** @brief Отрисовщик сцены
+	/** \brief Отрисовщик сцены
 	 */
 	class Renderer
 	{
@@ -29,38 +31,51 @@ namespace graphics
 		
 		inline static Renderer& instance() { return *m_instance; }
 		
+		void set_graphics(const GContainerSPtr &container);
+		
+		inline GContainerSPtr graphics() { return m_graphics; }
+		
+		void invalidate();
+		
 		inline bool is_valid() { return m_valid; }
 		
-		/** @brief Обработать смену GL-поверхности
-		 * @param width Ширина GL-поверхности.
-		 * @param height Высота GL-поверхности.
-		 * @param is_tablet Признак того, что устройство является планшетом (иначе телефон).
+		/** \brief Обработать смену GL-поверхности
+		 * NOTE Выполняется в графическом потоке.
+		 * \param width Ширина GL-поверхности.
+		 * \param height Высота GL-поверхности.
+		 * \param is_tablet Признак того, что устройство является планшетом (иначе телефон).
 		 */
 		void on_surface_changed(int width, int height, bool is_tablet);
 		
-		/** @brief Обработать необходимость перерисовать кадр
+		/** \brief Обработать необходимость перерисовать кадр
+		 * NOTE Выполняется в графическом потоке.
 		 */
 		void on_draw_frame();
 		
+		/** \brief Получить шейдерную программу
+		 */
+		ShaderProgramSPtr get_program(shader_program_t program_type);
+		
 	private:
-		static Renderer* m_instance;
-		bool m_valid;							///< Признак актуальности текущего кадра
+		static Renderer* m_instance;			///< Единственный экземпляр отрисовщика
+		bool m_valid;							///< Признак того, что графику следует перерисовать
 		shader_programs_t m_shader_programs;	///< Шейдерные программы
-		float m_xr, m_yr, m_zr;
+		GContainerSPtr m_graphics;				///< Первичный контейнер графических объектов
+		utils::spin_lock m_graphics_lock;		///< Защита первичного графического объекта и флага актуальности графики
 		
 		Renderer();
 		
 		~Renderer();
 		
-		/** @brief Загрузить шейдеры и подготовить шейдерные программы
+		/** \brief Загрузить шейдеры и подготовить шейдерные программы
+		 * NOTE Выполняется в графическом потоке.
 		 */
 		void load_shaders();
 		
-		/** @brief Удалить все шейдеры и шейдерные программы
+		/** \brief Удалить все шейдеры и шейдерные программы
+		 * NOTE Выполняется в графическом потоке.
 		 */
 		void release_shaders();
-		
-		void draw_cube();
 	};
 	
 }

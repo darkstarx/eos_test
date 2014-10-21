@@ -87,11 +87,11 @@ namespace graphics
 		
 		/** @brief Установить значение для униформы текстуры
 		 */
-		void set_uniform_texture(GLint unit);
+		void set_uniform_texture(GLint index);
 		
 		/** @brief Установить значение для униформы маски
 		 */
-		void set_uniform_mask(GLint unit);
+		void set_uniform_mask(GLint index);
 		
 		/** @brief Установить значение для униформы матрицы трансформаций текстурных координат
 		 */

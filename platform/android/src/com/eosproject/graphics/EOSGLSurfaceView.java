@@ -34,9 +34,9 @@ public class EOSGLSurfaceView extends GLSurfaceView {
 		@Override
 		public void run() {
 			if (m_resumed) {
-				queueEvent(m_gl_thread_tick);
 				nativeOnTick();
 				postDelayed(m_main_thread_tick, TICK_INTERVAL);
+				queueEvent(m_gl_thread_tick);
 			}
 		}
 	};

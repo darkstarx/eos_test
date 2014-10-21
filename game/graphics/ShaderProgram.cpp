@@ -73,7 +73,6 @@ namespace graphics
 	{
 		if (matrix == uniform_values.u_mvpmatrix) return;
 		uniform_values.u_mvpmatrix = matrix;
-		use();
 		glUniformMatrix4fv(uniforms.u_mvpmatrix, 1, GL_FALSE, &matrix[0][0]);
 	}
 	
@@ -82,33 +81,30 @@ namespace graphics
 	{
 		if (color == uniform_values.u_color) return;
 		uniform_values.u_color = color;
-		use();
 		ASSERT(uniforms.u_color != INVALID_ID);
 		glUniform4f(uniforms.u_color, color.r, color.g, color.b, color.a);
 	}
 	
 	
-	void ShaderProgram::set_uniform_texture(GLint unit)
+	void ShaderProgram::set_uniform_texture(GLint index)
 	{
-		use();
 		if (uniforms.u_texture == INVALID_ID)
 		{
 			uniforms.u_texture = glGetUniformLocation(m_program, "u_texture");
 			ASSERT(uniforms.u_texture != INVALID_ID);
 		}
-		glUniform1i(uniforms.u_texture, unit);
+		glUniform1i(uniforms.u_texture, index);
 	}
 	
 	
-	void ShaderProgram::set_uniform_mask(GLint unit)
+	void ShaderProgram::set_uniform_mask(GLint index)
 	{
-		use();
 		if (uniforms.u_mask == INVALID_ID)
 		{
 			uniforms.u_mask = glGetUniformLocation(m_program, "u_mask");
 			ASSERT(uniforms.u_mask != INVALID_ID);
 		}
-		glUniform1i(uniforms.u_mask, unit);
+		glUniform1i(uniforms.u_mask, index);
 	}
 	
 	
@@ -116,7 +112,6 @@ namespace graphics
 	{
 		if (matrix == uniform_values.u_texmatrix) return;
 		uniform_values.u_texmatrix = matrix;
-		use();
 		if (uniforms.u_texmatrix == INVALID_ID)
 		{
 			uniforms.u_texmatrix = glGetUniformLocation(m_program, "u_texmatrix");
@@ -128,9 +123,8 @@ namespace graphics
 	
 	void ShaderProgram::set_attribute_position(const void* data, GLsizei stride)
 	{
-		
 		ctx().enable_vertex_attrib_array(attributes.a_position);
-		glVertexAttribPointer(attributes.a_position, 2, GL_FLOAT, GL_FALSE, stride, data);
+		glVertexAttribPointer(attributes.a_position, 3, GL_FLOAT, GL_FALSE, stride, data);
 	}
 	
 	

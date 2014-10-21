@@ -2,6 +2,8 @@
 #include <graphics/gl.hpp>
 #include <graphics/Context.hpp>
 #include <graphics/ShaderProgram.hpp>
+#include <graphics/GContainer.hpp>
+#include "MatrixStack.hpp"
 #include <resources/FileSystem.hpp>
 #include <utils/log.hpp>
 
@@ -16,6 +18,7 @@ namespace graphics
 	{
 		ASSERT(!m_instance);
 		m_instance = new Renderer();
+		if (app_alive()) app().on_renderer_created();
 	}
 	
 	
@@ -24,42 +27,80 @@ namespace graphics
 		ASSERT(m_instance);
 		delete m_instance;
 		m_instance = NULL;
+		if (app_alive()) app().on_renderer_destroyed();
+	}
+	
+	
+	void Renderer::set_graphics(const GContainerSPtr& container)
+	{
+		if (m_graphics == container) return;
+		// Переопределение первичного графического контейнера не является атомарным, защищаем смену
+		// контейнера при его переопределении
+		utils::scoped_lock guard(m_graphics_lock);
+		if (m_graphics) m_graphics->set_prime(false);
+		m_graphics = container;
+		if (m_graphics) m_graphics->set_prime(true);
+		// После смены графики экран следует обновить
+		m_valid = false;
+	}
+	
+	
+	void Renderer::invalidate()
+	{
+		utils::scoped_lock guard(m_graphics_lock);
+		m_valid = false;
 	}
 	
 	
 	void Renderer::on_surface_changed(int width, int height, bool is_tablet)
 	{
+		DLOG(INFO) << "Surface changed: " << width << "x" << height << ", tablet: " << std::boolalpha << is_tablet;
 		// Загружаем шейдеры
 		load_shaders();
 		
 		// Настраиваем отображение сцены
-		glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+		glViewport(0, 0, width, height);
+		
+		// Enable depth buffer
+// 		glEnable(GL_DEPTH_TEST);
 // 		glClearDepth(1.0);
 // 		glDepthFunc(GL_LESS);
-// 		glEnable(GL_DEPTH_TEST);
-// 		glShadeModel(GL_SMOOTH);
-// 		glMatrixMode(GL_PROJECTION);
-// 		glLoadIdentity();
-// 		gluPerspective(45.0f, (float)width / (float)height, 0.1f, 100.0f);
-// 		glMatrixMode(GL_MODELVIEW);
+		// Enable back face culling
+// 		glEnable(GL_CULL_FACE);
+		
+		// Матрица проекции
+		matrix().load_identity();
+		float aspect = (float)width / (float)height;
+// 		matrix().ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
+// 		matrix().frustum(0.0f, width, 0.0f, height, -100.0f, 100.0f);
+// 		matrix().frustum(-aspect, aspect, -1.0f, 1.0f, 1.0f, 100.0f);
+		matrix().perspective(45.0f, aspect, 0.0001f, 100.0f); // если zNear=0 то ничего не рисует, пока не выяснено почему
 	}
 	
 	
 	void Renderer::on_draw_frame()
 	{
-		// Если сцена не изменилась, не нужно перерисовывать кадр
-		if (m_valid) return;
-		
+		// Проверка на необходимость обновления экрана
+		{
+			utils::scoped_lock guard(m_graphics_lock);
+			if (m_valid) return;
+			m_valid = true;
+		}
+		// Очистить экран следует даже если графика не определена
+		glClear(GL_COLOR_BUFFER_BIT/* | GL_DEPTH_BUFFER_BIT*/);
+		// Если графика не определена, то рисовать нечего
+		if (!m_graphics) return;
 		// Перерисовка кадра
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		m_xr -= 0.5;
-		m_yr -= 0.5;
-		m_zr -= 0.5;
-		draw_cube();
-		glFlush();
-		
-		// Сцена отрисована
-// 		m_valid = true;
+		m_graphics->draw();
+	}
+	
+	
+	ShaderProgramSPtr Renderer::get_program(shader_program_t program_type)
+	{
+		return m_shader_programs[program_type];
 	}
 	
 	
@@ -89,63 +130,8 @@ namespace graphics
 	}
 	
 	
-	void Renderer::draw_cube()
-	{
-		
-// 		glLoadIdentity();
-// 		glTranslatef(0.0f, 0.0f, -7.0f);    // Сдвинуть вглубь экрана
-// 		
-// 		glRotatef(m_xr, 1.0f, 0.0f, 0.0f);   // Вращение куба по X, Y, Z
-// 		glRotatef(m_yr, 0.0f, 1.0f, 0.0f);   // Вращение куба по X, Y, Z
-// 		glRotatef(m_zr, 0.0f, 0.0f, 1.0f);   // Вращение куба по X, Y, Z
-// 		
-// 		glBegin(GL_QUADS);                  // Рисуем куб
-// 		
-// 		glColor3f(0.0f, 1.0f, 0.0f);        // Синяя сторона (Верхняя)
-// 		glVertex3f( 1.0f, 1.0f, -1.0f);     // Верхний правый угол квадрата
-// 		glVertex3f(-1.0f, 1.0f, -1.0f);     // Верхний левый
-// 		glVertex3f(-1.0f, 1.0f,  1.0f);     // Нижний левый
-// 		glVertex3f( 1.0f, 1.0f,  1.0f);     // Нижний правый
-// 		
-// 		glColor3f(1.0f, 0.5f, 0.0f);        // Оранжевая сторона (Нижняя)
-// 		glVertex3f( 1.0f, -1.0f,  1.0f);    // Верхний правый угол квадрата
-// 		glVertex3f(-1.0f, -1.0f,  1.0f);    // Верхний левый
-// 		glVertex3f(-1.0f, -1.0f, -1.0f);    // Нижний левый
-// 		glVertex3f( 1.0f, -1.0f, -1.0f);    // Нижний правый
-// 		
-// 		glColor3f(1.0f, 0.0f, 0.0f);        // Красная сторона (Передняя)
-// 		glVertex3f( 1.0f,  1.0f, 1.0f);     // Верхний правый угол квадрата
-// 		glVertex3f(-1.0f,  1.0f, 1.0f);     // Верхний левый
-// 		glVertex3f(-1.0f, -1.0f, 1.0f);     // Нижний левый
-// 		glVertex3f( 1.0f, -1.0f, 1.0f);     // Нижний правый
-// 		
-// 		glColor3f(1.0f,1.0f,0.0f);          // Желтая сторона (Задняя)
-// 		glVertex3f( 1.0f, -1.0f, -1.0f);    // Верхний правый угол квадрата
-// 		glVertex3f(-1.0f, -1.0f, -1.0f);    // Верхний левый
-// 		glVertex3f(-1.0f,  1.0f, -1.0f);    // Нижний левый
-// 		glVertex3f( 1.0f,  1.0f, -1.0f);    // Нижний правый
-// 		
-// 		glColor3f(0.0f,0.0f,1.0f);          // Синяя сторона (Левая)
-// 		glVertex3f(-1.0f,  1.0f,  1.0f);    // Верхний правый угол квадрата
-// 		glVertex3f(-1.0f,  1.0f, -1.0f);    // Верхний левый
-// 		glVertex3f(-1.0f, -1.0f, -1.0f);    // Нижний левый
-// 		glVertex3f(-1.0f, -1.0f,  1.0f);    // Нижний правый
-// 		
-// 		glColor3f(1.0f,0.0f,1.0f);          // Фиолетовая сторона (Правая)
-// 		glVertex3f( 1.0f,  1.0f, -1.0f);    // Верхний правый угол квадрата
-// 		glVertex3f( 1.0f,  1.0f,  1.0f);    // Верхний левый
-// 		glVertex3f( 1.0f, -1.0f,  1.0f);    // Нижний левый
-// 		glVertex3f( 1.0f, -1.0f, -1.0f);    // Нижний правый
-// 		
-// 		glEnd();                            // Закончили квадраты   
-	}
-	
-	
 	Renderer::Renderer()
 	: m_valid(false)
-	, m_xr(0)
-	, m_yr(0)
-	, m_zr(0)
 	{
 		ctx_create();
 		LOG(INFO) << "Renderer created";
