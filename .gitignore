@@ -38,3 +38,7 @@ platform/android/assets/*
 
 # Other
 .directory
+
+# We need of ext libraries
+!lib/win/x86/*
+!lib/win/x64/*
