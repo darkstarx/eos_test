@@ -19,7 +19,6 @@ set(SOURCE_FILES
 	${SRC_GAME}
 )
 
-
 include_directories(
 	${PROJECT_DIR}/game
 	${ANDROID_DIR}/jni

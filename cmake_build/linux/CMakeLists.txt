@@ -40,19 +40,27 @@ else()
 endif()
 
 # Find OpenGL
-find_package(OpenGL REQUIRED)
+find_package(OpenGL)
 if (OPENGL_FOUND)
 	include_directories(${OPENGL_INCLUDE_DIR})
 else (OPENGL_FOUND)
-	message("OpenGL environment missing")
+	message(SEND_ERROR "OpenGL environment missing")
 endif (OPENGL_FOUND)
 
+# Find OpenAL
+find_package(OpenAL)
+if (OPENAL_FOUND)
+	include_directories(${OPENAL_INCLUDE_DIR})
+else (OPENAL_FOUND)
+	message(SEND_ERROR "OpenAL environment missing")
+endif (OPENAL_FOUND)
+
 # Find SDL2
-find_package(SDL2 REQUIRED)
+find_package(SDL2)
 if (SDL2_FOUND)
 	include_directories(${SDL2_INCLUDE_DIR})
 else (SDL2_FOUND)
-	message("SDL2 environment missing")
+	message(SEND_ERROR "SDL2 environment missing")
 endif (SDL2_FOUND)
 
 
@@ -65,16 +73,17 @@ include_directories(
 
 set(EXT_LIBRARIES
 	${OPENGL_LIBRARIES}
+	${OPENAL_LIBRARY}
 	${SDL2_LIBRARIES}
 	pthread
 )
 
 include(${PROJECT_DIR}/cmake_build/common/game.cmake)
 
-
 list(APPEND GAME_DEFINES
 	__DESKTOP__
 )
+
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 target_link_libraries(${PROJECT_NAME} ${EXT_LIBRARIES})
