@@ -6,7 +6,7 @@
 
 
 SDL_Window *MainWindow::window = 0;
-const float MainWindow::TICK_INTERVAL = 1000.0f / 60.0f;
+const float MainWindow::TICK_INTERVAL = 1000.0f / 100.0f;
 std::atomic<bool> MainWindow::render_working;
 std::shared_ptr<std::thread> MainWindow::render_thread;
 

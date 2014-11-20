@@ -12,20 +12,21 @@ namespace utils
 	public:
 		spin_lock()
 		{
-			lck.clear();
+			m_lock.clear();
 		}
+		
 		void lock()
 		{
-			while (lck.test_and_set(std::memory_order_acquire)) ;
+			while (m_lock.test_and_set(std::memory_order_acquire)) ;
 		}
 		
 		void unlock()
 		{
-			lck.clear(std::memory_order_release);
+			m_lock.clear(std::memory_order_release);
 		}
 		
 	private:
-		std::atomic_flag lck;
+		std::atomic_flag m_lock;
 	};
 	
 	
