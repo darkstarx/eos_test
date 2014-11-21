@@ -11,7 +11,8 @@ namespace graphics
 	 */
 	enum shader_program_t
 	{
-		sp_simple = 0
+		sp_simple,
+		sp_simple3d
 	};
 	
 	

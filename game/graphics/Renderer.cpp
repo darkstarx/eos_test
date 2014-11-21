@@ -66,7 +66,7 @@ namespace graphics
 		
 		// Enable depth buffer
 		glEnable(GL_DEPTH_TEST);
-		glClearDepth(1.0);
+		glClearDepthf(1.0);
 		glDepthFunc(GL_LESS);
 // 		// Enable back face culling
 // 		glEnable(GL_CULL_FACE);
@@ -113,7 +113,7 @@ namespace graphics
 	
 	void Renderer::load_shaders()
 	{
-		// Простая шейдерная программа
+		// Простая шейдерная программа для вершин из двух элементов
 		{
 			utils::bytearray src_vert;
 			utils::bytearray src_frag;
@@ -126,6 +126,21 @@ namespace graphics
 			
 			ShaderProgramSPtr simple_program(new ShaderProgram(src_vert, src_frag));
 			m_shader_programs[sp_simple] = simple_program;
+		}
+		
+		// Простая шейдерная программа для вершин из трех элементов
+		{
+			utils::bytearray src_vert;
+			utils::bytearray src_frag;
+			const std::string src_vert_path("simple3d.vsh");
+			const std::string src_frag_path("simple3d.fsh");
+			if (!resources().load_asset(src_vert_path, src_vert))
+				LOG(FATAL) << "Ошибка загрузки шейдера " << src_vert_path;
+			if (!resources().load_asset(src_frag_path, src_frag))
+				LOG(FATAL) << "Ошибка загрузки шейдера " << src_frag_path;
+			
+			ShaderProgramSPtr simple_program(new ShaderProgram(src_vert, src_frag));
+			m_shader_programs[sp_simple3d] = simple_program;
 		}
 		
 	}
