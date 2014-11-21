@@ -73,6 +73,7 @@ namespace graphics
 		
 		// Строим исходную матрицу проекции, от которой будут отталкиваться координаты объектов
 		matrix().load_identity();
+/*
 		// Аспект - отношение ширины вьюпорта к его высоте
 		float aspect = (float)width / (float)height;
 		// Перспектива: ближняя и дальняя плоскости отсечения всегда положительные, ось Z направлена из глубины в
@@ -82,10 +83,8 @@ namespace graphics
 		// Камеру разворачиваем вокруг оси Z в обратную сторону, чтобы смотрела по направлению оси Z. Таким образом
 		// добиваемся того, что ось Z направлена от экрана в глубину, а не наоборот.
 		matrix().look_at(position_t(0.0f, 0.0f, 0.0f), position_t(0.0f, 0.0f, 1.0f), position_t(0.0f, 1.0f, 0.0f));
-		
-// 		matrix().ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
-// 		matrix().frustum(0.0f, width, 0.0f, height, -100.0f, 100.0f);
-// 		matrix().frustum(-aspect, aspect, -1.0f, 1.0f, 1.0f, 100.0f);
+*/
+		matrix().ortho(0.0f, static_cast<GLfloat>(width), 0.0f, static_cast<GLfloat>(height), -100.0f, 100.0f);
 	}
 	
 	

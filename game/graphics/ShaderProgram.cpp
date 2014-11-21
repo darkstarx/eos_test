@@ -121,7 +121,14 @@ namespace graphics
 	}
 	
 	
-	void ShaderProgram::set_attribute_position(const void* data, GLsizei stride)
+	void ShaderProgram::set_attribute_position2(const void* data, GLsizei stride)
+	{
+		ctx().enable_vertex_attrib_array(attributes.a_position);
+		glVertexAttribPointer(attributes.a_position, 2, GL_FLOAT, GL_FALSE, stride, data);
+	}
+	
+	
+	void ShaderProgram::set_attribute_position3(const void* data, GLsizei stride)
 	{
 		ctx().enable_vertex_attrib_array(attributes.a_position);
 		glVertexAttribPointer(attributes.a_position, 3, GL_FLOAT, GL_FALSE, stride, data);

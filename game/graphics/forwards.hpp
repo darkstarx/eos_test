@@ -23,8 +23,8 @@ namespace graphics
 	class GContainer;
 	typedef std::shared_ptr<GContainer> GContainerSPtr;
 	
-	class GBox;
-	typedef std::shared_ptr<GBox> GBoxSPtr;
+	class GRectangle;
+	typedef std::shared_ptr<GRectangle> GRectangleSPtr;
 	
 }
 

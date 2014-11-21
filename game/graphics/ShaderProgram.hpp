@@ -99,7 +99,11 @@ namespace graphics
 		
 		/** @brief Установить значение для атрибута позиций
 		 */
-		void set_attribute_position(const void *data, GLsizei stride = 0);
+		void set_attribute_position2(const void *data, GLsizei stride = 0);
+		
+		/** @brief Установить значение для атрибута позиций
+		 */
+		void set_attribute_position3(const void *data, GLsizei stride = 0);
 		
 		/** @brief Установить значение для атрибута текстурных координат изображения
 		 */

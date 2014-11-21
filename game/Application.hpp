@@ -82,7 +82,7 @@ private:
 	bool m_paused;					///< Признак приостановки работы приложения
 	bool m_stopped;					///< Признак остановки работы приложения
 	
-	graphics::GBoxSPtr m_box;
+	graphics::GRectangleSPtr m_rect;
 	
 	Application();
 	

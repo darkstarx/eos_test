@@ -5,8 +5,9 @@
 namespace graphics
 {
 	
-	GMeshable::GMeshable()
+	GMeshable::GMeshable(mesh_type_e mesh_type)
 	: super()
+	, m_mesh_type(mesh_type)
 	, m_vertices_count(0)
 	, m_indices_count(0)
 	, m_vertices_valid(false)
@@ -46,7 +47,16 @@ namespace graphics
 	void GMeshable::set_program()
 	{
 		super::set_program();
-		m_program->set_attribute_position(m_vertices.get());
+		switch (m_mesh_type) {
+			case mesh_type_e::mt_2d:
+				m_program->set_attribute_position2(m_vertices.get());
+				break;
+			case mesh_type_e::mt_3d:
+				m_program->set_attribute_position3(m_vertices.get());
+				break;
+			default:
+				throw("Некорректный тип вершинной сетки");
+		}
 	}
 	
 }

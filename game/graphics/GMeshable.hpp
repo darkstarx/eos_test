@@ -9,11 +9,17 @@ namespace graphics
 	
 	class GMeshable : public GObject
 	{
+	public:
+		enum class mesh_type_e {
+			mt_2d,
+			mt_3d
+		};
+		
 	private:
 		typedef GObject super;
 		
 	public:
-		GMeshable();
+		GMeshable(mesh_type_e mesh_type);
 		
 		virtual ~GMeshable();
 		
@@ -49,6 +55,7 @@ namespace graphics
 		virtual void set_program();
 		
 	private:
+		mesh_type_e m_mesh_type;			///< Тип сетки вершин (2d/3d)
 		bool m_vertices_valid;				///< Признак актуальности буфера вершин
 		bool m_indices_valid;				///< Признак актуальности буфера индексов
 	};
