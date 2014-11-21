@@ -65,19 +65,27 @@ namespace graphics
 		glViewport(0, 0, width, height);
 		
 		// Enable depth buffer
-// 		glEnable(GL_DEPTH_TEST);
-// 		glClearDepth(1.0);
-// 		glDepthFunc(GL_LESS);
-		// Enable back face culling
+		glEnable(GL_DEPTH_TEST);
+		glClearDepth(1.0);
+		glDepthFunc(GL_LESS);
+// 		// Enable back face culling
 // 		glEnable(GL_CULL_FACE);
 		
-		// Матрица проекции
+		// Строим исходную матрицу проекции, от которой будут отталкиваться координаты объектов
 		matrix().load_identity();
+		// Аспект - отношение ширины вьюпорта к его высоте
 		float aspect = (float)width / (float)height;
+		// Перспектива: ближняя и дальняя плоскости отсечения всегда положительные, ось Z направлена из глубины в
+		// сторону экрана, позиция камеры в нулевой точке мировых координат, смотрит в глубину экрана, расположена
+		// в горизонтальной плоскости осей X и Z.
+		matrix().perspective(45.0f, aspect, 0.0001f, 100.0f);
+		// Камеру разворачиваем вокруг оси Z в обратную сторону, чтобы смотрела по направлению оси Z. Таким образом
+		// добиваемся того, что ось Z направлена от экрана в глубину, а не наоборот.
+		matrix().look_at(position_t(0.0f, 0.0f, 0.0f), position_t(0.0f, 0.0f, 1.0f), position_t(0.0f, 1.0f, 0.0f));
+		
 // 		matrix().ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
 // 		matrix().frustum(0.0f, width, 0.0f, height, -100.0f, 100.0f);
 // 		matrix().frustum(-aspect, aspect, -1.0f, 1.0f, 1.0f, 100.0f);
-		matrix().perspective(45.0f, aspect, 0.0001f, 100.0f); // если zNear=0 то ничего не рисует, пока не выяснено почему
 	}
 	
 	
@@ -90,7 +98,7 @@ namespace graphics
 			m_valid = true;
 		}
 		// Очистить экран следует даже если графика не определена
-		glClear(GL_COLOR_BUFFER_BIT/* | GL_DEPTH_BUFFER_BIT*/);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// Если графика не определена, то рисовать нечего
 		if (!m_graphics) return;
 		// Перерисовка кадра

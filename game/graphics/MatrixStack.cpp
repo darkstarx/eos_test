@@ -117,4 +117,10 @@ namespace graphics
 		m_matrix *= glm::perspective(fovy, aspect, zNear, zFar);
 	}
 	
+	
+	void MatrixStack::look_at(const position_t& eye, const position_t& center, const position_t& up)
+	{
+		m_matrix *= glm::lookAt(glm::vec3(eye.x, eye.y, eye.z), glm::vec3(center.x, center.y, center.z), glm::vec3(up.x, up.y, up.z));
+	}
+	
 }

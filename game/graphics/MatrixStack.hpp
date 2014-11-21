@@ -61,6 +61,8 @@ namespace graphics
 		
 		void perspective(GLfloat fovy, GLfloat aspect, GLfloat zNear, GLfloat zFar);
 		
+		void look_at(const position_t &eye, const position_t &center, const position_t &up);
+		
 		inline const glm::mat4& get() const { return m_matrix; }
 		
 		inline const GLfloat* array() const { return &m_matrix[0][0]; }

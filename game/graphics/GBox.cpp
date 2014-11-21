@@ -77,7 +77,7 @@ namespace graphics
 	void GBox::update_indices()
 	{
 		{
-			m_indices_count = 4;
+			m_indices_count = 6;
 			if (!m_indices)
 				m_indices.reset(new GLushort[m_indices_count], utils::array_deleter<GLushort>);
 		}
@@ -89,18 +89,27 @@ namespace graphics
 		*cursor++ = 0;
 		*cursor++ = 1;
 		
+		*cursor++ = 4;
+		*cursor++ = 5;
+		
 		super::update_indices();
 	}
 	
 	
 	void GBox::before_draw()
 	{
-		// Применяем трансфиормацию смещения объекта
+		// ВНИМАНИЕ! Трансформации выполняем в обратном порядке (от матрицы проекции к элементу меша), т.е. следующим
+		// образом: Proj_m * View_m * Model_m (= Cur_m * Translate_m * Scale_m * Rot_m) * Element_v = Transformed_Element_v
+		
+		// Смещаем объект после поворота и масштабирования в конечную позицию объекта
 		matrix().translate(m_box);
-		// Применяем трансфиормации масштабирования и поворота объекта
+		// Возвращаем объект из точки трансформации в начальную позицию
 		if (!!m_transform_point) matrix().translate(m_transform_point);
-		matrix().rotate(rotation());
+		// Масштабируем объект
 		matrix().scale(scale());
+		// Попорачиваем объект
+		matrix().rotate(rotation());
+		// Смещаем объект в точку трансформации
 		if (!!m_transform_point) matrix().translate(-m_transform_point.x, -m_transform_point.y, -m_transform_point.z);
 		
 		super::before_draw();

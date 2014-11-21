@@ -29,8 +29,11 @@ void Application::tick()
 	if (!renderer_alive()) return;
 	if (!m_box) return;
 	graphics::rotation_t rot = m_box->rotation();
-	rot.angle_y += 0.5f;
+	graphics::box_t box = m_box->box();
+	rot.angle_y += 0.8f;
 	m_box->set_rotation(rot);
+	box.y += 0.0005f;
+	m_box->set_box(box);
 }
 
 
@@ -71,7 +74,7 @@ void Application::on_renderer_created()
 	LOG(INFO) << "Application got signal renderer created";
 	graphics::GContainerSPtr scene(new graphics::GContainer());
 	renderer().set_graphics(scene);
-	m_box.reset(new graphics::GBox(graphics::box_t(-0.2f, -0.2f, -1.0f, 0.4f, 0.4f, 0.4f)));
+	m_box.reset(new graphics::GBox(graphics::box_t(-0.2f, -0.5f, 1.0f, 0.4f, 0.4f, 0.4f)));
 	m_box->set_transform_point(graphics::position_t(0.2f, 0.2f, 0.2f));
 	m_box->set_visible(true);
 	m_box->set_color(graphics::color_t(1.0f, 1.0f, 0.5f, 1.0f));
