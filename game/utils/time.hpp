@@ -1,11 +1,10 @@
 #ifndef UTILS_TIME_HPP
 #define UTILS_TIME_HPP
 
-#include <sys/time.h>
-
 #ifdef _WIN32
 	#include <utils/time_impl.hpp>
 #else
+    #include <sys/time.h>
 	#include <time.h>
 #endif
 
