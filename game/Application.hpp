@@ -4,6 +4,7 @@
 #include <graphics/types.hpp>
 #include <graphics/forwards.hpp>
 #include <graphics/events.hpp>
+#include <utils/forwards.hpp>
 
 
 class Application
@@ -79,10 +80,13 @@ public:
 	
 private:
 	static Application* m_instance;
+	utils::task_queue_sptr m_task_queue;
 	bool m_paused;					///< Признак приостановки работы приложения
 	bool m_stopped;					///< Признак остановки работы приложения
 	
 	graphics::GRectangleSPtr m_rect;
+	utils::task_wptr_t m_task;
+	void rotate_rect();
 	
 	Application();
 	

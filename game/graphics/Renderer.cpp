@@ -68,8 +68,6 @@ namespace graphics
 		glEnable(GL_DEPTH_TEST);
 		glClearDepthf(1.0);
 		glDepthFunc(GL_LESS);
-// 		// Enable back face culling
-// 		glEnable(GL_CULL_FACE);
 		
 		// Строим исходную матрицу проекции, от которой будут отталкиваться координаты объектов
 		matrix().load_identity();

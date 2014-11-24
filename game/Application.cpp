@@ -4,6 +4,7 @@
 #include <graphics/GRectangle.hpp>
 #include <resources/FileSystem.hpp>
 #include <utils/log.hpp>
+#include "utils/task_queue.hpp"
 
 
 Application* Application::m_instance = NULL;
@@ -26,11 +27,8 @@ void Application::destroy()
 
 void Application::tick()
 {
-	if (!renderer_alive()) return;
-	if (!m_rect) return;
-	graphics::rotation_t rot = m_rect->rotation();
-	rot.angle_z += 0.8f;
-	m_rect->set_rotation(rot);
+	if (m_paused || m_stopped) return;
+	m_task_queue->process_queue();
 }
 
 
@@ -76,11 +74,14 @@ void Application::on_renderer_created()
 	m_rect->set_visible(true);
 	m_rect->set_color(graphics::color_t(1.0f, 1.0f, 0.5f, 1.0f));
 	scene->add_object(m_rect);
+	
+	m_task = m_task_queue->enqueue_repeatedly(std::bind(&Application::rotate_rect, this), 1.0 / 60.0);
 }
 
 
 void Application::on_renderer_destroyed()
 {
+	if (!m_task.expired()) m_task_queue->unqueue(m_task);
 	m_rect.reset();
 	LOG(INFO) << "Application got signal renderer destroyed";
 }
@@ -106,8 +107,19 @@ bool Application::on_key_up(keycode_t keycode)
 }
 
 
+void Application::rotate_rect()
+{
+	if (!renderer_alive()) return;
+	if (!m_rect) return;
+	graphics::rotation_t rot = m_rect->rotation();
+	rot.angle_z += 0.8f;
+	m_rect->set_rotation(rot);
+}
+
+
 Application::Application()
-: m_paused(true)
+: m_task_queue(new utils::task_queue)
+, m_paused(true)
 , m_stopped(true)
 {
 	LOG(INFO) << "Application created";
