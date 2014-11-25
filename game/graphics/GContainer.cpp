@@ -23,7 +23,7 @@ namespace graphics
 		// Если это первичный графический контейнер, то он обязан оповестить отрисовщика о том,
 		// что графика изменилась, и её следует перерисовать, либо оповестить об этом владельца
 		if (m_prime) {
-			if (renderer_alive()) renderer().invalidate();
+			renderer().invalidate();
 		} else invalidate();
 	}
 	

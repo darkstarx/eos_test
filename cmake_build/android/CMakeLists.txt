@@ -29,6 +29,7 @@ include_directories(
 
 set(EXT_LIBRARIES
 	GLESv2
+	EGL
 	log
 	android
 )
@@ -116,6 +117,8 @@ add_custom_target(clearlog-auto
 )
 add_dependencies(clearlog-auto install-auto)
 
+set(PACKAGE com.eosproject.eos)
+set(ACTIVITY EOSActivity)
 add_custom_target(start
     COMMAND ${ADB} shell am start -a android.intent.action.MAIN -c [android.intent.category.LAUNCHER] -n ${PACKAGE}/.${ACTIVITY}
     WORKING_DIRECTORY ${ANDROID_DIR}

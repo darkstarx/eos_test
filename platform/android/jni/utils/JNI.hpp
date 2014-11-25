@@ -32,6 +32,7 @@ namespace jni
 		inline JNIEnv* env() const { return m_env; }
 		inline jobject obj() const { return m_obj; }
 		
+		static bool present();
 		static JEnv& instance();
 		
 	private:

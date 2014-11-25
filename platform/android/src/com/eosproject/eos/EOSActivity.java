@@ -1,26 +1,29 @@
 package com.eosproject.eos;
+// https://code.google.com/p/android-native-egl-example/
 
-import com.eosproject.graphics.EOSGLSurfaceView;
-
+import android.app.Activity;
+import android.content.res.AssetManager;
 import android.os.Bundle;
-import android.provider.Settings;
+import android.os.Handler;
+import android.widget.RelativeLayout;
+import android.view.Surface;
+import android.view.SurfaceView;
+import android.view.SurfaceHolder;
+import android.view.MotionEvent;
 import android.view.KeyEvent;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.RelativeLayout;
-import android.app.Activity;
-import android.content.pm.ActivityInfo;
-import android.content.res.AssetManager;
 
 
-public class EOSActivity extends Activity {
+public class EOSActivity extends Activity implements SurfaceHolder.Callback
+{
 	
 	private static EOSActivity m_instance = null;
+	private static long TICK_INTERVAL = 1000 / 60;
 	
+	private Handler m_handler = new Handler();
 	protected RelativeLayout m_layout = null;
-	protected EOSGLSurfaceView m_glView = null;
 	
 	public static EOSActivity getInstance() {
 		return m_instance;
@@ -30,20 +33,36 @@ public class EOSActivity extends Activity {
 		return m_instance.getAssets();
 	}
 	
+	private final Runnable m_tick = new Runnable() {
+		@Override
+		public void run() {
+			try {
+				nativeOnTick();
+				m_handler.postDelayed(m_tick, TICK_INTERVAL);
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	};
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		m_instance = this;
+		
 		final Window window = getWindow();
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		
+		SurfaceView surfaceView = new SurfaceView(this);
+		surfaceView.setKeepScreenOn(true);
+		surfaceView.getHolder().addCallback(this);
+		
 		m_layout = new RelativeLayout(this);
+		m_layout.addView(surfaceView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 		setContentView(m_layout);
 		
-		m_glView = new EOSGLSurfaceView(this);
-		m_glView.setKeepScreenOn(true);
-		m_layout.addView(m_glView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+		m_instance = this;
 		
 		nativeOnCreate();
 	}
@@ -53,48 +72,61 @@ public class EOSActivity extends Activity {
 	{
 		super.onStart();
 		nativeOnStart();
-		
-		if (Settings.System.getInt(getContentResolver(), Settings.System.ACCELEROMETER_ROTATION, 0) == 1) {
-			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-		} else {
-			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-		}
-	}
-	
-	@Override
-	protected void onStop()
-	{
-		nativeOnStop();
-		super.onStop();
-	}
-	
-	@Override
-	protected void onPause()
-	{
-		nativeOnPause();
-		m_glView.onPause();
-		super.onPause();
+		m_handler.post(m_tick);
 	}
 	
 	@Override
 	protected void onResume()
 	{
 		super.onResume();
-		m_glView.onResume();
 		nativeOnResume();
+	}
+	
+	@Override
+	protected void onPause()
+	{
+		nativeOnPause();
+		super.onPause();
+	}
+	
+	@Override
+	protected void onStop()
+	{
+		m_handler.removeCallbacks(m_tick);
+		nativeOnStop();
+		super.onStop();
+	}
+	
+	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
+		nativeSetSurface(holder.getSurface());
+	}
+	
+	public void surfaceCreated(SurfaceHolder holder) {
+	}
+	
+	public void surfaceDestroyed(SurfaceHolder holder) {
+		nativeSetSurface(null);
 	}
 	
 	@Override
 	protected void onDestroy()
 	{
-		m_glView.setVisibility(View.INVISIBLE);
-		m_glView = null;
-		m_layout = null;
-		
 		nativeOnDestroy();
-		
+		m_layout = null;
 		m_instance = null;
 		super.onDestroy();
+	}
+	
+	@Override
+	public boolean onTouchEvent(MotionEvent event)
+	{
+		if (event.getActionIndex() == 0) {
+			final int action = event.getAction();
+			final float x = event.getX(0);
+			final float y = event.getY(0);
+			nativeOnTouchEvent(action, x, y);
+		}
+		return true;
 	}
 	
 	@Override
@@ -102,20 +134,34 @@ public class EOSActivity extends Activity {
 	{
 		switch (keyCode) {
 			case KeyEvent.KEYCODE_BACK:
-				EOSActivity.this.finish();
+				finish();
 				return true;
+			default:
+				return nativeOnKeyDown(keyCode);
 		}
-		return super.onKeyDown(keyCode, event);
+	}
+	
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event)
+	{
+		return nativeOnKeyUp(keyCode);
 	}
 	
 	static {
 		System.loadLibrary("eos_client");
 	}
 	
+	
 	private native void nativeOnCreate();
-	private native void nativeOnDestroy();
 	private native void nativeOnStart();
 	private native void nativeOnResume();
+	private native void nativeOnTick();
 	private native void nativeOnPause();
 	private native void nativeOnStop();
+	private native void nativeOnDestroy();
+	
+	private static native void nativeSetSurface(Surface surface);
+	private static native void nativeOnTouchEvent(final int touch_action, final float x, final float y);
+	private static native boolean nativeOnKeyDown(final int keycode);
+	private static native boolean nativeOnKeyUp(final int keycode);
 }

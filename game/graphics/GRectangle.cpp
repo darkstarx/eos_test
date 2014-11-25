@@ -1,5 +1,6 @@
 #include <graphics/GRectangle.hpp>
 #include <graphics/MatrixStack.hpp>
+#include "Context.hpp"
 #include <utils/deleter.hpp>
 
 
@@ -95,7 +96,7 @@ namespace graphics
 	
 	void GRectangle::do_draw()
 	{
-		glDrawElements(GL_TRIANGLE_STRIP, m_indices_count, GL_UNSIGNED_SHORT, m_indices.get());
+		ctx().draw_elements(GL_TRIANGLE_STRIP, m_indices_count, GL_UNSIGNED_SHORT, m_indices.get());
 	}
 	
 }

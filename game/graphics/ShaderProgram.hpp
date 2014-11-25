@@ -10,7 +10,7 @@
 namespace graphics
 {
 	
-	/** @brief Шейдерная программа
+	/** \brief Шейдерная программа
 	 */
 	class ShaderProgram
 	{
@@ -63,71 +63,76 @@ namespace graphics
 		
 		~ShaderProgram();
 		
-		/** @brief Использовать данную шейдерную программу
+		/** \brief Инициализировать шейдерную программу
+		 */
+		void initialize(const std::string &vertex_src, const std::string &fragment_src);
+		
+		/** \brief Деинициализировать шейдерную программу
+		 */
+		void deinitialize();
+		
+		/** \brief Использовать данную шейдерную программу
 		 */
 		void use();
 		
-		/** @brief Установить любое вещественное значение в указанную униформу
+		/** \brief Установить любое вещественное значение в указанную униформу
 		 * Если шейдерная программа поддерживает указанную юниформу name, устанавливает
 		 * ей указанное значение value.
 		 */
 		void set_uniform(const GLfloat value, const std::string& name);
 		
-		/** @brief Установить MVP-матрицу трансформаций
+		/** \brief Установить MVP-матрицу трансформаций
 		 */
 		void set_uniform_mvpmatrix(const glm::mat4 &matrix);
 		
-		/** @brief Проверить наличие униформы цвета у шейдерной программы
+		/** \brief Проверить наличие униформы цвета у шейдерной программы
 		 */
 		inline bool has_uniform_color() const { return uniforms.u_color != INVALID_ID; }
 		
-		/** @brief Установить значение для униформы цвета
+		/** \brief Установить значение для униформы цвета
 		 */
 		void set_uniform_color(const color_t &color);
 		
-		/** @brief Установить значение для униформы текстуры
+		/** \brief Установить значение для униформы текстуры
 		 */
 		void set_uniform_texture(GLint index);
 		
-		/** @brief Установить значение для униформы маски
+		/** \brief Установить значение для униформы маски
 		 */
 		void set_uniform_mask(GLint index);
 		
-		/** @brief Установить значение для униформы матрицы трансформаций текстурных координат
+		/** \brief Установить значение для униформы матрицы трансформаций текстурных координат
 		 */
 		void set_uniform_texmatrix(const glm::mat3 &matrix);
 		
-		/** @brief Установить значение для атрибута позиций
+		/** \brief Установить значение для атрибута позиций
 		 */
 		void set_attribute_position2(const void *data, GLsizei stride = 0);
 		
-		/** @brief Установить значение для атрибута позиций
+		/** \brief Установить значение для атрибута позиций
 		 */
 		void set_attribute_position3(const void *data, GLsizei stride = 0);
 		
-		/** @brief Установить значение для атрибута текстурных координат изображения
+		/** \brief Установить значение для атрибута текстурных координат изображения
 		 */
 		void set_attribute_texcoord(const void *data, GLsizei stride = 0);
 		
-		/** @brief Установить значение для атрибута текстурных координат маски
+		/** \brief Установить значение для атрибута текстурных координат маски
 		 */
 		void set_attribute_masktexcoord(const void *data, GLsizei stride = 0);
 		
-		/** @brief Установить значение для атрибута цветового буфера
+		/** \brief Установить значение для атрибута цветового буфера
 		 */
 		void set_attribute_color(const void *data, GLsizei stride = 0);
 		
-		/** @brief Сбросить все установки буферов для атрибутов
+		/** \brief Сбросить все установки буферов для атрибутов
 		 */
 		void reset_attributes();
 		
 	private:
-		GLuint m_vertex_shader;
-		GLuint m_fragment_shader;
-		GLuint m_program;
-		
-		GLuint create_shader(GLenum type, const std::string &source);
-		GLint check_program_status(GLenum param);
+		GLuint m_vertex_shader;		///< Идентификатор вершинного шейдера
+		GLuint m_fragment_shader;	///< Идентификатор фрагментного шейдера
+		GLuint m_program;			///< Идентификатор шейдерной программы
 	};
 	
 }

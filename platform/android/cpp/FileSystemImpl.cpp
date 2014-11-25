@@ -7,6 +7,8 @@
 
 std::string FileSystem::resources_path()
 {
+	jni::JEnv jenv;
+	
 	const jclass jc_filesystem = jni::get_class("com/eosproject/resources/FileSystem");
 	ASSERT(jc_filesystem);
 	
@@ -22,6 +24,8 @@ std::string FileSystem::resources_path()
 
 bool FileSystem::load_asset(const std::string& path, utils::bytearray& data)
 {
+	jni::JEnv jenv;
+	
 	const jclass jc_activity = jni::get_class("com/eosproject/eos/EOSActivity");
 	ASSERT(jc_activity);
 	

@@ -9,12 +9,14 @@
 		#include <GL/glu.h>
 	#else			// Linux
 		#define GL_GLEXT_PROTOTYPES
+		#include <EGL/egl.h>
 		#include <GL/gl.h>
 		#include <GL/glu.h>
 		#include <GL/glext.h>
 	#endif
 #elif defined __ANDROID__
 	#define GL_GLEXT_PROTOTYPES
+	#include <EGL/egl.h>
 	#include <GLES2/gl2.h>
 	#include <GLES2/gl2ext.h>
 #else

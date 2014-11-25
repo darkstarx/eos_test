@@ -15,23 +15,19 @@
 class MainWindow
 {
 private:
-	static SDL_Window * window;							///< Окно приложения
-	static const float TICK_INTERVAL;					///< Время между тиками в миллисекундах
-	static std::atomic<bool> render_working;			///< признак активности графического потока
-	static std::shared_ptr<std::thread> render_thread;	///< объект управления графическим потоком
-
+	static const float TICK_INTERVAL;						///< Время между тиками в миллисекундах
+	static SDL_Window *m_window;							///< Окно приложения
+	static std::atomic<bool> m_render_working;				///< Признак активности графического потока
+	static std::shared_ptr<std::thread> m_render_thread;	///< Объект управления графическим потоком
+	
 	static void init_SDL_graphics();
-
+	
 	static void graphics_worker();
-
+	
 	static void start_rendering();
-
+	
 	static void stop_rendering();
 	
-	static void pause();
-	
-	static void resume();
-
 public:
 	/** @brief Создать главное окно приложения
 	 */

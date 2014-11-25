@@ -36,7 +36,7 @@ void Application::start()
 {
 	if (!m_stopped) return;
 	m_stopped = false;
-	LOG(INFO) << "Application started";
+	DLOG(INFO) << "Application started";
 }
 
 
@@ -44,7 +44,7 @@ void Application::stop()
 {
 	if (m_stopped) return;
 	m_stopped = true;
-	LOG(INFO) << "Application stopped";
+	DLOG(INFO) << "Application stopped";
 }
 
 
@@ -52,7 +52,7 @@ void Application::pause()
 {
 	if (m_paused) return;
 	m_paused = true;
-	LOG(INFO) << "Application paused";
+	DLOG(INFO) << "Application paused";
 }
 
 
@@ -60,59 +60,59 @@ void Application::resume()
 {
 	if (!m_paused) return;
 	m_paused = false;
-	LOG(INFO) << "Application resumed";
+	DLOG(INFO) << "Application resumed";
 }
 
 
-void Application::on_renderer_created()
+void Application::on_graphics_created()
 {
-	LOG(INFO) << "Application got signal renderer created";
-	graphics::GContainerSPtr scene(new graphics::GContainer());
-	renderer().set_graphics(scene);
+	DLOG(INFO) << "Application receives graphics creation";
+	if (m_scene) return;
+	
+	m_scene.reset(new graphics::GContainer());
+	renderer().set_graphics(m_scene);
 	m_rect.reset(new graphics::GRectangle(graphics::rectangle_t(350.0f, 350.0f, 80.0f, 80.0f)));
 	m_rect->set_transform_point(graphics::position_t(40.0f, 40.0f));
 	m_rect->set_visible(true);
 	m_rect->set_color(graphics::color_t(1.0f, 1.0f, 0.5f, 1.0f));
-	scene->add_object(m_rect);
+	m_scene->add_object(m_rect);
 	
 	m_task = m_task_queue->enqueue_repeatedly(std::bind(&Application::rotate_rect, this), 1.0 / 60.0);
 }
 
 
-void Application::on_renderer_destroyed()
+void Application::on_graphics_destroyed()
 {
-	if (!m_task.expired()) m_task_queue->unqueue(m_task);
-	m_rect.reset();
-	LOG(INFO) << "Application got signal renderer destroyed";
+	DLOG(INFO) << "Application receives graphics destruction";
 }
 
 
 void Application::on_touch_action(touch_action_t touch_action, const graphics::position_t& position)
 {
-	LOG(INFO) << "Application receivs touch action";
+	DLOG(INFO) << "Application receives touch action";
 }
 
 
 bool Application::on_key_down(keycode_t keycode)
 {
-	LOG(INFO) << "Application receivs key_down action";
+	DLOG(INFO) << "Application receivs key_down action";
 	return false;
 }
 
 
 bool Application::on_key_up(keycode_t keycode)
 {
-	LOG(INFO) << "Application receivs key_up action";
+	DLOG(INFO) << "Application receivs key_up action";
 	return false;
 }
 
 
 void Application::rotate_rect()
 {
-	if (!renderer_alive()) return;
 	if (!m_rect) return;
 	graphics::rotation_t rot = m_rect->rotation();
 	rot.angle_z += 0.8f;
+	if (rot.angle_z > 360.0f) rot.angle_z = 0.0f;
 	m_rect->set_rotation(rot);
 }
 
@@ -122,11 +122,11 @@ Application::Application()
 , m_paused(true)
 , m_stopped(true)
 {
-	LOG(INFO) << "Application created";
+	DLOG(INFO) << "Application created";
 }
 
 
 Application::~Application()
 {
-	LOG(INFO) << "Application destroyed";
+	DLOG(INFO) << "Application destroyed";
 }

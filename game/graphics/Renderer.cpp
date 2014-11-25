@@ -5,29 +5,48 @@
 #include <graphics/GContainer.hpp>
 #include "MatrixStack.hpp"
 #include <resources/FileSystem.hpp>
-#include <utils/log.hpp>
 
 
 namespace graphics
 {
 	
-	Renderer *Renderer::m_instance = NULL;
+	Renderer* Renderer::m_instance = NULL;
+	RendererDestroyer Renderer::m_destroyer;
 	
-	
-	void Renderer::create()
+	/** @class RendererDestroyer */
+	RendererDestroyer::~RendererDestroyer()
 	{
-		ASSERT(!m_instance);
-		m_instance = new Renderer();
-		if (app_alive()) app().on_renderer_created();
+		ASSERT(m_instance);
+		m_instance->m_instance = NULL;
+		delete m_instance;
 	}
 	
 	
-	void Renderer::destroy()
+	
+	/** \class Renderer */
+	
+	Renderer& Renderer::instance()
 	{
-		ASSERT(m_instance);
-		delete m_instance;
-		m_instance = NULL;
-		if (app_alive()) app().on_renderer_destroyed();
+		if (!m_instance)
+		{
+			m_instance = new Renderer();
+			m_destroyer.init(m_instance);
+		}
+		return *m_instance;
+	}
+	
+	
+	void Renderer::on_ctx_create()
+	{
+		ctx_create();
+		if (app_alive()) app().on_graphics_created();
+	}
+	
+	
+	void Renderer::on_ctx_destroy()
+	{
+		if (app_alive()) app().on_graphics_destroyed();
+		ctx_destroy();
 	}
 	
 	
@@ -55,22 +74,16 @@ namespace graphics
 	void Renderer::on_surface_changed(int width, int height, bool is_tablet)
 	{
 		DLOG(INFO) << "Surface changed: " << width << "x" << height << ", tablet: " << std::boolalpha << is_tablet;
-		// Загружаем шейдеры
-		load_shaders();
+		invalidate();
 		
-		// Настраиваем отображение сцены
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-		glViewport(0, 0, width, height);
+		// Устанавливаем вьюпорт принудительно, так как gl-контекст между сменами поверхности мог быть разрушен
+		gl::set_viewport(rectangle_t(0, 0, width, height), true);
 		
-		// Enable depth buffer
-		glEnable(GL_DEPTH_TEST);
-		glClearDepthf(1.0);
-		glDepthFunc(GL_LESS);
+		// Запоминаем размеры экрана. Если размеры поверхности не изменились, матрицы не изменяем
+		if (!gl::set_screen_size(dimension_t(width, height))) return;
 		
 		// Строим исходную матрицу проекции, от которой будут отталкиваться координаты объектов
-		matrix().load_identity();
+		matrix().reset();
 /*
 		// Аспект - отношение ширины вьюпорта к его высоте
 		float aspect = (float)width / (float)height;
@@ -95,7 +108,7 @@ namespace graphics
 			m_valid = true;
 		}
 		// Очистить экран следует даже если графика не определена
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		ctx().clear_buffers(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// Если графика не определена, то рисовать нечего
 		if (!m_graphics) return;
 		// Перерисовка кадра
@@ -122,8 +135,12 @@ namespace graphics
 			if (!resources().load_asset(src_frag_path, src_frag))
 				LOG(FATAL) << "Ошибка загрузки шейдера " << src_frag_path;
 			
-			ShaderProgramSPtr simple_program(new ShaderProgram(src_vert, src_frag));
-			m_shader_programs[sp_simple] = simple_program;
+			ShaderProgramSPtr &program = m_shader_programs[sp_simple];
+			if (program) {
+				program->initialize(src_vert, src_frag);
+			} else {
+				program.reset(new ShaderProgram(src_vert, src_frag));
+			}
 		}
 		
 		// Простая шейдерная программа для вершин из трех элементов
@@ -137,8 +154,12 @@ namespace graphics
 			if (!resources().load_asset(src_frag_path, src_frag))
 				LOG(FATAL) << "Ошибка загрузки шейдера " << src_frag_path;
 			
-			ShaderProgramSPtr simple_program(new ShaderProgram(src_vert, src_frag));
-			m_shader_programs[sp_simple3d] = simple_program;
+			ShaderProgramSPtr &program = m_shader_programs[sp_simple3d];
+			if (program) {
+				program->initialize(src_vert, src_frag);
+			} else {
+				program.reset(new ShaderProgram(src_vert, src_frag));
+			}
 		}
 		
 	}
@@ -146,21 +167,21 @@ namespace graphics
 	
 	void Renderer::release_shaders()
 	{
-		m_shader_programs.clear();
+		for (shader_programs_t::iterator it = m_shader_programs.begin(), end = m_shader_programs.end(); it != end; ++it) {
+			it->second->deinitialize();
+		}
 	}
 	
 	
 	Renderer::Renderer()
 	: m_valid(false)
 	{
-		ctx_create();
 		LOG(INFO) << "Renderer created";
 	}
 	
 	
 	Renderer::~Renderer()
 	{
-		ctx_destroy();
 		LOG(INFO) << "Renderer destroyed";
 	}
 	

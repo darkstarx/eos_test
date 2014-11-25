@@ -2,6 +2,7 @@
 #define GRAPHICS_TYPES_HPP
 
 #include <graphics/gl.hpp>
+#include <ostream>
 
 
 namespace graphics
@@ -11,6 +12,7 @@ namespace graphics
 	 */
 	enum shader_program_t
 	{
+		sp_none,
 		sp_simple,
 		sp_simple3d
 	};
@@ -156,7 +158,20 @@ namespace graphics
 	{ return lhs.r == rhs.r && lhs.g == rhs.g && lhs.b == rhs.b && lhs.a == rhs.a; }
 	
 	inline bool operator !=(const color_t& lhs, const color_t& rhs)
-	{ return !(lhs==rhs); }
+	{ return !(lhs == rhs); }
+	
+	
+	inline std::ostream& operator <<(std::ostream& lhs, const position_t& rhs)
+	{ lhs << "[" << rhs.x << ", " << rhs.y << ", " << rhs.z << "]"; return lhs; }
+	
+	inline std::ostream& operator <<(std::ostream& lhs, const dimension_t& rhs)
+	{ lhs << "[" << rhs.w << ", " << rhs.h << ", " << rhs.d << "]"; return lhs; }
+	
+	inline std::ostream& operator <<(std::ostream& lhs, const box_t& rhs)
+	{ lhs << "[" << rhs.position() << ", " << rhs.dimension() << "]"; return lhs; }
+	
+	inline std::ostream& operator <<(std::ostream& lhs, const rectangle_t& rhs)
+	{ lhs << "[[" << rhs.x << ", " << rhs.y << "], [" << rhs.w << ", " << rhs.h << "]]"; return lhs; }
 	
 }
 
