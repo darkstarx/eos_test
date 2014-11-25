@@ -39,6 +39,12 @@ namespace graphics
 		
 		static MatrixStack& instance();
 		
+		/** \brief Очистить стек матриц и установить текущую матрицу единичной
+		 */
+		void reset();
+		
+		/** \brief Установить текущую матрицу единичной
+		 */
 		void load_identity();
 		
 		void push();

@@ -62,6 +62,12 @@ namespace jni
 	}
 	
 	
+	bool JEnv::present()
+	{
+		return detail::singleton;
+	}
+	
+	
 	JEnv& JEnv::instance()
 	{
 		CHECK(detail::singleton) << "Java environment absent";

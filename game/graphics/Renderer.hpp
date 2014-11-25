@@ -4,6 +4,7 @@
 #include <graphics/types.hpp>
 #include <graphics/forwards.hpp>
 #include <utils/spin_lock.hpp>
+#include <utils/log.hpp>
 #include <Application.hpp>
 #include <map>
 
@@ -11,11 +12,26 @@
 namespace graphics
 {
 	
+	class Renderer;
+	
+	class RendererDestroyer
+	{
+	public:
+		~RendererDestroyer();
+		inline void init(Renderer *instance) { ASSERT(!m_instance); m_instance = instance; }
+	private:
+		Renderer *m_instance;
+	};
+	
+	
 	/** \brief Отрисовщик сцены
 	 */
 	class Renderer
 	{
 	private:
+		friend class RendererDestroyer;
+		friend class gl;
+		
 		typedef std::map<shader_program_t, ShaderProgramSPtr> shader_programs_t;
 		
 	public:
@@ -23,13 +39,13 @@ namespace graphics
 		
 		Renderer& operator=(const Renderer&) = delete;
 		
-		static void create();
+		static bool is_alive() { return m_instance; }
 		
-		static void destroy();
+		static Renderer& instance();
 		
-		inline static bool alive() { return m_instance != 0; }
+		void on_ctx_create();
 		
-		inline static Renderer& instance() { return *m_instance; }
+		void on_ctx_destroy();
 		
 		void set_graphics(const GContainerSPtr &container);
 		
@@ -58,6 +74,7 @@ namespace graphics
 		
 	private:
 		static Renderer* m_instance;			///< Единственный экземпляр отрисовщика
+		static RendererDestroyer m_destroyer;	///< Разрушитель экземпляра рендерера
 		bool m_valid;							///< Признак того, что графику следует перерисовать
 		shader_programs_t m_shader_programs;	///< Шейдерные программы
 		GContainerSPtr m_graphics;				///< Первичный контейнер графических объектов
@@ -79,12 +96,6 @@ namespace graphics
 	};
 	
 }
-
-inline void renderer_create() { graphics::Renderer::create(); }
-
-inline void renderer_destroy() { graphics::Renderer::destroy(); }
-
-inline bool renderer_alive() { return graphics::Renderer::alive(); }
 
 inline graphics::Renderer& renderer() { return graphics::Renderer::instance(); }
 

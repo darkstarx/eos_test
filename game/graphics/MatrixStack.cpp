@@ -8,7 +8,7 @@ namespace graphics
 	MatrixStack* MatrixStack::m_instance = NULL;
 	MatrixStackDestroyer MatrixStack::m_destroyer;
 	
-	/** @class MatrixStackDestroyer */
+	/** \class MatrixStackDestroyer */
 	MatrixStackDestroyer::~MatrixStackDestroyer()
 	{
 		delete m_instance;
@@ -16,7 +16,7 @@ namespace graphics
 	
 	
 	
-	/** @class MatrixStack */
+	/** \class MatrixStack */
 	
 	MatrixStack::MatrixStack()
 	: m_matrix(1.0f)
@@ -37,6 +37,13 @@ namespace graphics
 			m_destroyer.init(m_instance);
 		}
 		return *m_instance;
+	}
+	
+	
+	void MatrixStack::reset()
+	{
+		while (!m_stack.empty()) m_stack.pop();
+		m_matrix = glm::mat4(1.0f);
 	}
 	
 	

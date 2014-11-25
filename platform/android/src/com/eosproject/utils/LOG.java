@@ -97,7 +97,7 @@ public class LOG
 
 	private static native void nativeLog(int level, String file, int line, String text);
 	
-    public static native void nativeSetLogDirectoryPath(String path);
-    public static native void nativeCreateLogFile();
-    public static native void nativeFlushLogFile();
+	public static native void nativeSetLogDirectoryPath(String path);
+	public static native void nativeCreateLogFile();
+	public static native void nativeFlushLogFile();
 }

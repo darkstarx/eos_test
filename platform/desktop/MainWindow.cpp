@@ -5,10 +5,10 @@
 #include <chrono>
 
 
-SDL_Window *MainWindow::window = 0;
 const float MainWindow::TICK_INTERVAL = 1000.0f / 60.0f;
-std::atomic<bool> MainWindow::render_working;
-std::shared_ptr<std::thread> MainWindow::render_thread;
+SDL_Window *MainWindow::m_window = 0;
+std::atomic<bool> MainWindow::m_render_working;
+std::shared_ptr<std::thread> MainWindow::m_render_thread;
 
 
 void MainWindow::init_SDL_graphics()
@@ -27,7 +27,7 @@ void MainWindow::init_SDL_graphics()
 	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
 
 	static const std::string app_name = "eos_test";
-	window = SDL_CreateWindow(
+	m_window = SDL_CreateWindow(
 		app_name.c_str(),
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
@@ -35,7 +35,7 @@ void MainWindow::init_SDL_graphics()
 		SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL
 	);
 	
-	if (window == NULL)
+	if (m_window == NULL)
 	{
 		LOG(FATAL) << "Unable to create window, error: " << SDL_GetError();
 	}
@@ -45,9 +45,7 @@ void MainWindow::init_SDL_graphics()
 void MainWindow::graphics_worker()
 {
 	// Создаем GL-контекст
-	SDL_GLContext glcontext = SDL_GL_CreateContext(window);
-	// Проверяем версию OpenGL
-	LOG(INFO) << "OpenGL " << glGetString(GL_VERSION);
+	SDL_GLContext glcontext = SDL_GL_CreateContext(m_window);
 #ifdef _WIN32
 	// Инициализируем GLEW
 	glewExperimental = GL_TRUE;
@@ -56,9 +54,9 @@ void MainWindow::graphics_worker()
 		LOG(FATAL) << "GLEW Error: " << glewGetErrorString(status);
 #endif
 	// Устанавливаем GL-контекст текущим
-	SDL_GL_MakeCurrent(window, glcontext);
-	// Создаем рендерер
-	renderer_create();
+	SDL_GL_MakeCurrent(m_window, glcontext);
+	// Оповещаем рендерер о создании GL-контекста
+	renderer().on_ctx_create();
 	// Сообщаем рендереру о том, что поверхность сформирована
 	renderer().on_surface_changed(WINDOW_WIDTH, WINDOW_HEIGHT, true);
 	
@@ -70,14 +68,14 @@ void MainWindow::graphics_worker()
 	std::chrono::time_point<std::chrono::system_clock> check_point = std::chrono::system_clock::now();
 #endif
 	// Выполняем графический цикл, пока приложение не будет остановлено
-	while (render_working)
+	while (m_render_working)
 	{
 		start = std::chrono::system_clock::now();
 		// Рисуем
 		if (!renderer().is_valid())
 		{
 			renderer().on_draw_frame();
-			SDL_GL_SwapWindow(window);
+			SDL_GL_SwapWindow(m_window);
 		}
 		end = std::chrono::system_clock::now();
 		// Отмечаем длительность отрисовки кадра
@@ -95,8 +93,8 @@ void MainWindow::graphics_worker()
 		}
 #endif
 	}
-	// Разрушаем рендерер
-	renderer_destroy();
+	// Оповещаем рендерер о разрушении GL-контекста
+	renderer().on_ctx_destroy();
 	// Графический поток останавливается, освобождаем GL-контекст
 	SDL_GL_DeleteContext(glcontext);
 }
@@ -104,18 +102,18 @@ void MainWindow::graphics_worker()
 
 void MainWindow::start_rendering()
 {
-	if (render_working) return;
-	render_working = true;
-	render_thread.reset(new std::thread(std::bind(&graphics_worker)));
+	if (m_render_working) return;
+	m_render_working = true;
+	m_render_thread.reset(new std::thread(std::bind(&MainWindow::graphics_worker)));
 }
 
 
 void MainWindow::stop_rendering()
 {
-	if (!render_working) return;
-	render_working = false;
-	render_thread->join();
-	render_thread.reset();
+	if (!m_render_working) return;
+	m_render_working = false;
+	m_render_thread->join();
+	m_render_thread.reset();
 }
 
 
@@ -153,7 +151,7 @@ int MainWindow::create_window()
 					break;
 				case SDL_WINDOWEVENT:
 					/** NOTE В Linux сигнал сворачивания окна приходит вместе с сигналом скрытия окна.
-					 * В Linux сигнал восстановления окна приходит вместе с сигналом показа окна.
+					 * NOTE В Linux сигнал восстановления окна приходит вместе с сигналом показа окна.
 					 */
 					switch (event.window.event)
 					{
@@ -190,7 +188,7 @@ int MainWindow::create_window()
 	app().stop();
 	
 	// Останавливаем графический поток и разрушаем рендерер
-	if (render_working) stop_rendering();
+	if (m_render_working) stop_rendering();
 	
 	// Разрушаем приложение
 	app_destroy();

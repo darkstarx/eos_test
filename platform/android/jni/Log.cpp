@@ -7,15 +7,16 @@
 extern "C"
 {
 	
-	JNIEXPORT void JNICALL Java_com_socialquantum_framework_utils_LOG_nativeLog(JNIEnv *env, jobject obj,
+	JNIEXPORT void JNICALL Java_com_eosproject_utils_LOG_nativeLog(JNIEnv *env, jobject obj,
 		jint level, jstring _file, jint line, jstring _text)
 	{
+		jni::JEnv jenv(env, NULL);
 		jni::JString jfile(_file);
 		jni::JString jtext(_text);
 		utils::Log(static_cast<utils::log_level_t>(level), jfile.str().c_str(), line).stream() << jtext.str();
 	}
 	
-	JNIEXPORT jboolean JNICALL Java_com_socialquantum_framework_utils_DLOG_nativeLogDebug(JNIEnv *env, jobject obj)
+	JNIEXPORT jboolean JNICALL Java_com_eosproject_utils_DLOG_nativeLogDebug(JNIEnv *env, jobject obj)
 	{
 		#ifndef NDEBUG
 		return true;
@@ -24,18 +25,19 @@ extern "C"
 		#endif//NDEBUG
 	}
 	
-	JNIEXPORT void JNICALL Java_com_socialquantum_framework_utils_LOG_nativeSetLogDirectoryPath(JNIEnv *env, jclass, jstring path)
+	JNIEXPORT void JNICALL Java_com_eosproject_utils_LOG_nativeSetLogDirectoryPath(JNIEnv *env, jclass, jstring path)
 	{
+		jni::JEnv jenv(env, NULL);
 		jni::JString jpath(path);
 		utils::android_set_log_directory_path(jpath.str());
 	}
 	
-	JNIEXPORT void JNICALL Java_com_socialquantum_framework_utils_LOG_nativeCreateLogFile(JNIEnv *env, jclass)
+	JNIEXPORT void JNICALL Java_com_eosproject_utils_LOG_nativeCreateLogFile(JNIEnv *env, jclass)
 	{
 		utils::android_create_log_file();
 	}
 	
-	JNIEXPORT void JNICALL Java_com_socialquantum_framework_utils_LOG_nativeFlushLogFile(JNIEnv *env, jclass)
+	JNIEXPORT void JNICALL Java_com_eosproject_utils_LOG_nativeFlushLogFile(JNIEnv *env, jclass)
 	{
 		utils::android_flush_log_file();
 	}

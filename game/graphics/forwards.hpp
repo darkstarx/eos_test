@@ -9,6 +9,7 @@ namespace graphics
 	
 	class ShaderProgram;
 	typedef std::shared_ptr<ShaderProgram> ShaderProgramSPtr;
+	typedef std::weak_ptr<ShaderProgram> ShaderProgramWPtr;
 	
 	class GObject;
 	typedef std::shared_ptr<GObject> GObjectSPtr;
