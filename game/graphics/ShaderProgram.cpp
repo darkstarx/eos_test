@@ -25,10 +25,9 @@ namespace graphics
 	void ShaderProgram::initialize(const std::string& vertex_src, const std::string& fragment_src)
 	{
 		if (m_program) {
-			LOG(WARN) << "Повторная инициализация проинициализированной шейдерной программы!";
+			LOG(WARN) << "Повторная инициализация инициализированной шейдерной программы!";
 			return;
 		}
-		
 		// Создаем вершинный шейдер
 		m_vertex_shader = ctx().create_shader(GL_VERTEX_SHADER, vertex_src);
 		// Создаем Фрагментный шейдер
@@ -57,15 +56,22 @@ namespace graphics
 			return;
 		}
 		
+		// Отсоединяем шейдеры от программы
 		ctx().detach_shader(m_program, m_vertex_shader);
 		ctx().detach_shader(m_program, m_fragment_shader);
+		// Удаляем шейдеры
 		ctx().delete_shader(m_vertex_shader);
 		ctx().delete_shader(m_fragment_shader);
+		// Удаляем программу
 		ctx().delete_program(m_program);
 		
+		// Обнуляем идентификаторы шейдеров и программы
 		m_vertex_shader = 0;
 		m_fragment_shader = 0;
 		m_program = 0;
+		
+		// Сбрасываем кэш значений униформ
+		uniform_values = uniform_values_t();
 	}
 	
 	

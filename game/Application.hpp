@@ -80,6 +80,7 @@ private:
 	
 	graphics::GContainerSPtr m_scene;
 	graphics::GRectangleSPtr m_rect;
+	graphics::GImageSPtr m_img;
 	utils::task_wptr_t m_task;
 	void rotate_rect();
 	

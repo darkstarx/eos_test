@@ -10,6 +10,7 @@ namespace graphics
 	
 	GObject::GObject()
 	: m_owner(0)
+	, m_color(graphics::color_t(1.0f, 1.0f, 1.0f, 1.0f))
 	, m_visible(true)
 	{
 	}

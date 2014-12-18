@@ -14,6 +14,7 @@ namespace graphics
 	
 	class Renderer;
 	
+	
 	class RendererDestroyer
 	{
 	public:

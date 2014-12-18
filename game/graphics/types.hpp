@@ -14,7 +14,9 @@ namespace graphics
 	{
 		sp_none,
 		sp_simple,
-		sp_simple3d
+		sp_simple3d,
+		sp_image,
+		sp_masked_image
 	};
 	
 	
@@ -172,6 +174,9 @@ namespace graphics
 	
 	inline std::ostream& operator <<(std::ostream& lhs, const rectangle_t& rhs)
 	{ lhs << "[[" << rhs.x << ", " << rhs.y << "], [" << rhs.w << ", " << rhs.h << "]]"; return lhs; }
+	
+	inline std::ostream& operator <<(std::ostream& lhs, const color_t& rhs)
+	{ lhs << "[" << rhs.r << ", " << rhs.g << ", " << rhs.b << ", " << rhs.a << "]"; return lhs; }
 	
 }
 

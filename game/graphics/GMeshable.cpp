@@ -46,15 +46,17 @@ namespace graphics
 	
 	void GMeshable::set_program()
 	{
-		switch (m_mesh_type) {
-			case mesh_type_e::mt_2d:
-				m_program = renderer().get_program(sp_simple);
-				break;
-			case mesh_type_e::mt_3d:
-				m_program = renderer().get_program(sp_simple3d);
-				break;
-			default:
-				throw("Некорректный тип вершинной сетки");
+		if (!m_program) {
+			switch (m_mesh_type) {
+				case mesh_type_e::mt_2d:
+					m_program = renderer().get_program(sp_simple);
+					break;
+				case mesh_type_e::mt_3d:
+					m_program = renderer().get_program(sp_simple3d);
+					break;
+				default:
+					throw("Некорректный тип вершинной сетки");
+			}
 		}
 		super::set_program();
 		switch (m_mesh_type) {

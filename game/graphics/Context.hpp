@@ -170,6 +170,8 @@ namespace graphics
 		/** Define an array of generic vertex attribute data
 		 * \param index Specifies the index of the generic vertex attribute to be modified.sizeSpecifies the number
 		 *   of components per generic vertex attribute. Must be 1, 2, 3, or 4. The initial value is 4.
+		 * \param size Specifies the number of components per generic vertex attribute. Must be 1, 2, 3, 4. Additionally,
+		 *   the symbolic constant GL_BGRA is accepted by glVertexAttribPointer. The initial value is 4.
 		 * \param type Specifies the data type of each component in the array. Symbolic constants GL_BYTE, GL_UNSIGNED_BYTE,
 		 *   GL_SHORT, GL_UNSIGNED_SHORT, GL_FIXED, or GL_FLOAT are accepted. The initial value is GL_FLOAT.
 		 * \param normalized Specifies whether fixed-point data values should be normalized (GL_TRUE) or converted directly
@@ -180,6 +182,72 @@ namespace graphics
 		 *   The initial value is 0.
 		 */
 		virtual void set_pointer_vertex_attr(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer) = 0;
+		
+		/** Generate texture names
+		 * \param n Specifies the number of texture names to be generated.
+		 * \param textures Specifies an array in which the generated texture names are stored.
+		 */
+		virtual void gen_textures(GLsizei n, GLuint *textures) = 0;
+		
+		/** Delete named textures
+		 * \param n Specifies the number of textures to be deleted.
+		 * \param textures Specifies an array of textures to be deleted.
+		 */
+		virtual void del_textures(GLsizei n, const GLuint *textures) = 0;
+		
+		/** Bind a named texture to a texturing target
+		 * \param texture Specifies the name of a texture.
+		 * \param unit Определяет, в каком текстурном юните будет выполнена привязка текстуры.
+		 */
+		virtual void bind_texture(GLuint texture, GLenum unit) = 0;
+		
+		/** Check if the texture is bind to a texturing target
+		 * \param texture Specifies the name of a texture.
+		 * \param unit Определяет, в каком текстурном юните будет выполнена привязка текстуры.
+		 */
+		virtual bool is_texture_binded(GLuint texture, GLenum unit) = 0;
+		
+		/** Select active texture unit
+		 * \param unit Specifies which texture unit to make active. The number of texture units is implementation dependent,
+		 * but must be at least 80. texture must be one of GL_TEXTUREi, where i ranges from zero to the value of
+		 * GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS minus one. The initial value is GL_TEXTURE0.
+		 */
+		virtual void select_texture(GLenum unit) = 0;
+		
+		/** Set texture parameters
+		 * \param target Specifies the target texture of the active texture unit, which must be either GL_TEXTURE_2D or GL_TEXTURE_CUBE_MAP.
+		 * \param pname Specifies the symbolic name of a single-valued texture parameter. pname can be one of the following:
+		 *   GL_TEXTURE_MIN_FILTER, GL_TEXTURE_MAG_FILTER, GL_TEXTURE_WRAP_S, or GL_TEXTURE_WRAP_T.
+		 * \param param Specifies the value of pname.
+		 */
+		virtual void set_tex_param(GLenum target, GLenum pname, GLint param) = 0;
+		
+		/** Specify a two-dimensional texture image
+		 * \param target Specifies the target texture. Must be GL_TEXTURE_2D, GL_PROXY_TEXTURE_2D, GL_TEXTURE_1D_ARRAY,
+		 *   GL_PROXY_TEXTURE_1D_ARRAY, GL_TEXTURE_RECTANGLE, GL_PROXY_TEXTURE_RECTANGLE, GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+		 *   GL_TEXTURE_CUBE_MAP_NEGATIVE_X, GL_TEXTURE_CUBE_MAP_POSITIVE_Y, GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+		 *   GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, or GL_PROXY_TEXTURE_CUBE_MAP.
+		 * \param level Specifies the level-of-detail number. Level 0 is the base image level. Level n is the nth mipmap reduction image.
+		 *   If target is GL_TEXTURE_RECTANGLE or GL_PROXY_TEXTURE_RECTANGLE, level must be 0. 
+		 * \param internalFormat Specifies the number of color components in the texture. Must be one of base internal formats given in Table 1,
+		 *   one of the sized internal formats given in Table 2, or one of the compressed internal formats given in Table 3, below. 
+		 * \param width Specifies the width of the texture image. All implementations support texture images that are at least 1024 texels wide. 
+		 * \param height Specifies the height of the texture image, or the number of layers in a texture array, in the case of the
+		 *   GL_TEXTURE_1D_ARRAY and GL_PROXY_TEXTURE_1D_ARRAY targets. All implementations support 2D texture images that are at least 1024
+		 *   texels high, and texture arrays that are at least 256 layers deep. 
+		 * \param border This value must be 0.
+		 * \param format Specifies the format of the pixel data. The following symbolic values are accepted: GL_RED, GL_RG, GL_RGB, GL_BGR,
+		 *   GL_RGBA, GL_BGRA, GL_RED_INTEGER, GL_RG_INTEGER, GL_RGB_INTEGER, GL_BGR_INTEGER, GL_RGBA_INTEGER, GL_BGRA_INTEGER, GL_STENCIL_INDEX,
+		 *   GL_DEPTH_COMPONENT, GL_DEPTH_STENCIL.
+		 * \param type Specifies the data type of the pixel data. The following symbolic values are accepted: GL_UNSIGNED_BYTE, GL_BYTE,
+		 *   GL_UNSIGNED_SHORT, GL_SHORT, GL_UNSIGNED_INT, GL_INT, GL_FLOAT, GL_UNSIGNED_BYTE_3_3_2, GL_UNSIGNED_BYTE_2_3_3_REV,
+		 *   GL_UNSIGNED_SHORT_5_6_5, GL_UNSIGNED_SHORT_5_6_5_REV, GL_UNSIGNED_SHORT_4_4_4_4, GL_UNSIGNED_SHORT_4_4_4_4_REV,
+		 *   GL_UNSIGNED_SHORT_5_5_5_1, GL_UNSIGNED_SHORT_1_5_5_5_REV, GL_UNSIGNED_INT_8_8_8_8, GL_UNSIGNED_INT_8_8_8_8_REV,
+		 *   GL_UNSIGNED_INT_10_10_10_2, and GL_UNSIGNED_INT_2_10_10_10_REV.
+		 * \param data Specifies a pointer to the image data in memory.
+		 */
+		virtual void load_texture(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border,
+			GLenum format, GLenum type, const GLvoid *data) = 0;
 		
 		virtual ~ContextBase();
 		
@@ -320,6 +388,21 @@ namespace graphics
 		
 		virtual void set_pointer_vertex_attr(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer);
 		
+		virtual void gen_textures(GLsizei n, GLuint *textures);
+		
+		virtual void del_textures(GLsizei n, const GLuint * textures);
+		
+		virtual void bind_texture(GLuint texture, GLenum unit);
+		
+		virtual bool is_texture_binded(GLuint texture, GLenum unit);
+		
+		virtual void select_texture(GLenum unit);
+		
+		virtual void set_tex_param(GLenum target, GLenum pname, GLint param);
+		
+		virtual void load_texture(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border,
+			GLenum format, GLenum type, const GLvoid *data);
+		
 		virtual ~Context();
 		
 	protected:
@@ -329,8 +412,7 @@ namespace graphics
 		
 	private:
 		struct internal;
-		std::unique_ptr<internal> m;
-		std::vector<bool> m_vertex_attrib_arrays_states;
+		std::unique_ptr<internal> m;						///< Внутренние данные контекста
 		
 		/** \brief Проверить статус шейдерной программы
 		 * \param program_id Идентификатор шейдерной программы.
@@ -409,6 +491,21 @@ namespace graphics
 		virtual void set_uniform_value(GLint /*location*/, GLfloat /*v0*/) {}
 		
 		virtual void set_pointer_vertex_attr(GLuint /*index*/, GLint /*size*/, GLenum /*type*/, GLboolean /*normalized*/, GLsizei /*stride*/, const GLvoid */*pointer*/) {}
+		
+		virtual void gen_textures(GLsizei /*n*/, GLuint */*textures*/) {}
+		
+		virtual void del_textures(GLsizei /*n*/, const GLuint */*textures*/) {}
+		
+		virtual void bind_texture(GLuint /*texture*/, GLenum /*unit*/) {}
+		
+		virtual bool is_texture_binded(GLuint /*texture*/, GLenum /*unit*/) { return true; }
+		
+		virtual void select_texture(GLenum /*unit*/) {}
+		
+		virtual void set_tex_param(GLenum /*target*/, GLenum /*pname*/, GLint /*param*/) {}
+		
+		virtual void load_texture(GLenum /*target*/, GLint /*level*/, GLint /*internalFormat*/, GLsizei /*width*/, GLsizei /*height*/, GLint /*border*/,
+			GLenum /*format*/, GLenum /*type*/, const GLvoid */*data*/) {}
 		
 		virtual ~ContextStub() {}
 		
