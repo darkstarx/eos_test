@@ -1,7 +1,9 @@
 #include <Application.hpp>
 #include <graphics/Renderer.hpp>
+#include <graphics/TextureManager.hpp>
 #include <graphics/GContainer.hpp>
 #include <graphics/GRectangle.hpp>
+#include <graphics/GImage.hpp>
 #include <resources/FileSystem.hpp>
 #include <utils/log.hpp>
 #include "utils/task_queue.hpp"
@@ -71,10 +73,15 @@ void Application::on_graphics_created()
 	
 	m_scene.reset(new graphics::GContainer());
 	renderer().set_graphics(m_scene);
-	m_rect.reset(new graphics::GRectangle(graphics::rectangle_t(350.0f, 350.0f, 80.0f, 80.0f)));
-	m_rect->set_transform_point(graphics::position_t(40.0f, 40.0f));
-	m_rect->set_visible(true);
-	m_rect->set_color(graphics::color_t(1.0f, 1.0f, 0.5f, 1.0f));
+	m_rect.reset(new graphics::GRectangle(graphics::rectangle_t(350.0f, 350.0f, 120.0f, 120.0f)));
+	m_rect->set_transform_point(graphics::position_t(60.0f, 60.0f));
+	m_rect->set_color(graphics::color_t(0.3f, 1.0f, 1.0f, 0.3f));
+	
+	m_img.reset(new graphics::GImage(graphics::rectangle_t(0, 0, 1196, 720)));
+	graphics::TextureSPtr tex = texmgr().get_texture_from_asset("test.png");
+	m_img->set_image(tex);
+	
+	m_scene->add_object(m_img);
 	m_scene->add_object(m_rect);
 	
 	m_task = m_task_queue->enqueue_repeatedly(std::bind(&Application::rotate_rect, this), 1.0 / 60.0);

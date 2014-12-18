@@ -60,7 +60,6 @@ namespace utils
 	task_queue::task_queue()
 	: m_tvnow(0.0)
 	, m_tvend(0.0)
-	, m_tvtmp(0.0)
 	, m_max_process_time(1.0 / 10)
 	{
 	}
@@ -98,8 +97,7 @@ namespace utils
 				// Обрабатываем список исполнения
 				tasks_t::iterator begin(m_hot.begin()), it(begin), end(m_hot.end());
 				for (; it != end; ++it) {
-					m_tvtmp = get_time();
-					if (m_tvend <= m_tvtmp) {
+					if (m_tvend <= get_time()) {
 						break;
 					}
 					{

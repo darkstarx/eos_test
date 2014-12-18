@@ -72,6 +72,6 @@ private:
 	std::string m_assets_path;
 };
 
-inline FileSystem& resources() { return FileSystem::instance(); }
+inline FileSystem& filesystem() { return FileSystem::instance(); }
 
 #endif //FILESYSTEM_H

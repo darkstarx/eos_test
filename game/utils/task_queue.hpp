@@ -79,7 +79,6 @@ namespace utils
 		spin_lock m_hot_lock;
 		double m_tvnow;
 		double m_tvend;
-		double m_tvtmp;
 		double m_max_process_time;
 		
 		/** \brief Добавить задачу в очередь с установкой времени её выполнения

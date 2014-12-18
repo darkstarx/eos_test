@@ -3,17 +3,15 @@
 #include <graphics/Context.hpp>
 #include <graphics/ShaderProgram.hpp>
 #include <graphics/GContainer.hpp>
-#include "MatrixStack.hpp"
+#include <graphics/MatrixStack.hpp>
 #include <resources/FileSystem.hpp>
 
 
 namespace graphics
 {
 	
-	Renderer* Renderer::m_instance = NULL;
-	RendererDestroyer Renderer::m_destroyer;
+	/** \class RendererDestroyer */
 	
-	/** @class RendererDestroyer */
 	RendererDestroyer::~RendererDestroyer()
 	{
 		ASSERT(m_instance);
@@ -24,6 +22,10 @@ namespace graphics
 	
 	
 	/** \class Renderer */
+	
+	Renderer* Renderer::m_instance = NULL;
+	RendererDestroyer Renderer::m_destroyer;
+	
 	
 	Renderer& Renderer::instance()
 	{
@@ -128,6 +130,10 @@ namespace graphics
 		load_program("simple", sp_simple);
 		// Простая шейдерная программа для вершин из трех элементов
 		load_program("simple3d", sp_simple3d);
+		// Простая шейдерная программа для текстурированного меша
+		load_program("image", sp_image);
+		// Простая шейдерная программа для текстурированного меша с маской
+		load_program("masked_image", sp_masked_image);
 	}
 	
 	
@@ -137,9 +143,9 @@ namespace graphics
 		utils::bytearray src_frag;
 		const std::string src_vert_path(name + ".vsh");
 		const std::string src_frag_path(name + ".fsh");
-		if (!resources().load_asset(src_vert_path, src_vert))
+		if (!filesystem().load_asset(src_vert_path, src_vert))
 			LOG(FATAL) << "Ошибка загрузки шейдера " << src_vert_path;
-		if (!resources().load_asset(src_frag_path, src_frag))
+		if (!filesystem().load_asset(src_frag_path, src_frag))
 			LOG(FATAL) << "Ошибка загрузки шейдера " << src_frag_path;
 		
 		ShaderProgramSPtr &program = m_shader_programs[program_type];

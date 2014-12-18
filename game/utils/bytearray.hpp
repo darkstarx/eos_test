@@ -1,6 +1,8 @@
 #ifndef UTILS_BYTEARRAY_H
 #define UTILS_BYTEARRAY_H
 #include <stdlib.h>
+#include <string>
+#include <memory>
 #include <cstdlib>
 #include <cstring>
 
