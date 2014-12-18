@@ -125,43 +125,29 @@ namespace graphics
 	void Renderer::load_shaders()
 	{
 		// Простая шейдерная программа для вершин из двух элементов
-		{
-			utils::bytearray src_vert;
-			utils::bytearray src_frag;
-			const std::string src_vert_path("simple.vsh");
-			const std::string src_frag_path("simple.fsh");
-			if (!resources().load_asset(src_vert_path, src_vert))
-				LOG(FATAL) << "Ошибка загрузки шейдера " << src_vert_path;
-			if (!resources().load_asset(src_frag_path, src_frag))
-				LOG(FATAL) << "Ошибка загрузки шейдера " << src_frag_path;
-			
-			ShaderProgramSPtr &program = m_shader_programs[sp_simple];
-			if (program) {
-				program->initialize(src_vert, src_frag);
-			} else {
-				program.reset(new ShaderProgram(src_vert, src_frag));
-			}
-		}
-		
+		load_program("simple", sp_simple);
 		// Простая шейдерная программа для вершин из трех элементов
-		{
-			utils::bytearray src_vert;
-			utils::bytearray src_frag;
-			const std::string src_vert_path("simple3d.vsh");
-			const std::string src_frag_path("simple3d.fsh");
-			if (!resources().load_asset(src_vert_path, src_vert))
-				LOG(FATAL) << "Ошибка загрузки шейдера " << src_vert_path;
-			if (!resources().load_asset(src_frag_path, src_frag))
-				LOG(FATAL) << "Ошибка загрузки шейдера " << src_frag_path;
-			
-			ShaderProgramSPtr &program = m_shader_programs[sp_simple3d];
-			if (program) {
-				program->initialize(src_vert, src_frag);
-			} else {
-				program.reset(new ShaderProgram(src_vert, src_frag));
-			}
-		}
+		load_program("simple3d", sp_simple3d);
+	}
+	
+	
+	void Renderer::load_program(const std::string& name, shader_program_t program_type)
+	{
+		utils::bytearray src_vert;
+		utils::bytearray src_frag;
+		const std::string src_vert_path(name + ".vsh");
+		const std::string src_frag_path(name + ".fsh");
+		if (!resources().load_asset(src_vert_path, src_vert))
+			LOG(FATAL) << "Ошибка загрузки шейдера " << src_vert_path;
+		if (!resources().load_asset(src_frag_path, src_frag))
+			LOG(FATAL) << "Ошибка загрузки шейдера " << src_frag_path;
 		
+		ShaderProgramSPtr &program = m_shader_programs[program_type];
+		if (program) {
+			program->initialize(src_vert, src_frag);
+		} else {
+			program.reset(new ShaderProgram(src_vert, src_frag));
+		}
 	}
 	
 	

@@ -89,6 +89,11 @@ namespace graphics
 		 */
 		void load_shaders();
 		
+		/** \brief Выполнить загрузку вершинного и фрагментного шейдеров и подготовить шейдерную программу
+		 * NOTE Выполняется в графическом потоке.
+		 */
+		void load_program(const std::string &name, shader_program_t program_type);
+		
 		/** \brief Удалить все шейдеры и шейдерные программы
 		 * NOTE Выполняется в графическом потоке.
 		 */
