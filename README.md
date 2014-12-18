@@ -4,4 +4,3 @@ Explorers of Saarum
 Dependencies.
 	- SLD2
 	- OpenGL
-	- glog
