@@ -1,5 +1,6 @@
 #include <resources/FileSystem.hpp>
-#include <utils/log.hpp>
+#include <utils/bytearray.hpp>
+#include <memory/Cache.hpp>
 #include <errno.h>
 
 #ifndef RESOURCES_PATH
@@ -27,7 +28,7 @@ FileSystem *FileSystem::m_instance = NULL;
 FileSystemDestroyer FileSystem::m_destroyer;
 
 
-/** @class FileSystemDestroyer */
+/** \class FileSystemDestroyer */
 
 FileSystemDestroyer::~FileSystemDestroyer()
 {
@@ -36,7 +37,7 @@ FileSystemDestroyer::~FileSystemDestroyer()
 
 
 
-/** @class FileSystem */
+/** \class FileSystem */
 
 FileSystem::FileSystem()
 : m_resource_path(RESOURCES_PATH)
@@ -63,8 +64,15 @@ FileSystem& FileSystem::instance()
 }
 
 
-bool FileSystem::load_from_file(const std::string& path, utils::bytearray& data)
+utils::bytearray_sptr_t FileSystem::load_from_file(const std::string &path)
 {
+	// Ключ кэширования
+	const std::string cache_key("f:" + path);
+	// Пытаемся найти данные в кэше
+	utils::bytearray_sptr_t ret = cache().get_obj<utils::bytearray_sptr_t>(cache_key);
+	// Если нашли, возвращаем их
+	if (ret) return ret;
+	// Данные в кэше не найдены, пытаемся загрузить их из файла
 	FILE *file;
 #ifdef _WIN32
 	fopen_s(&file, path.c_str(), "rb");
@@ -82,19 +90,23 @@ bool FileSystem::load_from_file(const std::string& path, utils::bytearray& data)
 	fseek(file, 0, SEEK_SET);
 	if (fread(buff.get(), buff.size(), 1, file) == 1)
 	{
-		data = buff;
 		fclose(file);
-		return true;
+		// Кэшируем загруженные данные
+		ret.reset(new utils::bytearray(buff));
+		cache().cache_obj(cache_key, ret);
+		// Возвращаем загруженные данные
+		return ret;
 	}
 	else
 	{
 		fclose(file);
-		return false;
+		// Ничего не удалось загрузить, возвращаем пустой указатель
+		return utils::bytearray_sptr_t();
 	}
 }
 
 
-bool FileSystem::save_to_file(const std::string& path, utils::bytearray& data)
+bool FileSystem::save_to_file(const std::string &path, utils::bytearray &data)
 {
 	FILE *file;
 #ifdef _WIN32
@@ -122,8 +134,8 @@ bool FileSystem::save_to_file(const std::string& path, utils::bytearray& data)
 }
 
 
-bool FileSystem::load_resource(const std::string& path, utils::bytearray& data)
+utils::bytearray_sptr_t FileSystem::load_resource(const std::string &path)
 {
 	const std::string full_path = resources_path() + path;
-	return load_from_file(full_path, data);
+	return load_from_file(full_path);
 }

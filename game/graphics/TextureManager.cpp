@@ -2,6 +2,7 @@
 #include <graphics/Texture.hpp>
 #include <resources/Image.hpp>
 #include <resources/ImageLoader.hpp>
+#include <memory/Cache.hpp>
 
 
 namespace graphics
@@ -37,8 +38,14 @@ namespace graphics
 	
 	TextureSPtr TextureManager::get_texture_from_asset(const std::string &filename)
 	{
+		// Ключ кэширования
+		const std::string cache_key("ta:" + filename);
+		// Пытаемся найти текстуру в кэше
+		graphics::TextureSPtr tex = cache().get_obj<graphics::TextureSPtr>(cache_key);
+		// Если текстура найдена, возвращаем её
+		if (tex) return tex;
 		// Создаем объект текстуры
-		graphics::TextureSPtr tex(new graphics::Texture());
+		tex.reset(new graphics::Texture());
 		// Пытаемся загрузить изображение из ассетов
 		resources::ImageSPtr img = ImageLoader::load_from_asset(filename);
 		// Если не удалось загрузить изображение и из ассетов, то оставляем текстуру не инициализированной
@@ -47,6 +54,8 @@ namespace graphics
 		} else {
 			tex->initialize(img);
 			m_texture_sources[tex.get()].asset_name = filename;
+			// Кэшируем текстуру
+			cache().cache_obj(cache_key, tex);
 		}
 		// Запоминаем указатель на текстуру
 		m_textures.push_back(TextureWPtr(tex));
@@ -57,8 +66,14 @@ namespace graphics
 	
 	TextureSPtr TextureManager::get_texture_from_storage(const std::string &filename)
 	{
+		// Ключ кэширования
+		const std::string cache_key("fa:" + filename);
+		// Пытаемся найти текстуру в кэше
+		graphics::TextureSPtr tex = cache().get_obj<graphics::TextureSPtr>(cache_key);
+		// Если текстура найдена, возвращаем её
+		if (tex) return tex;
 		// Создаем объект текстуры
-		graphics::TextureSPtr tex(new graphics::Texture());
+		tex.reset(new graphics::Texture());
 		// Пытаемся загрузить изображение из ресурсов
 		resources::ImageSPtr img = ImageLoader::load_from_res(filename);
 		// Если не удалось загрузить изображение и из ресурсов, то оставляем текстуру не инициализированной
@@ -67,6 +82,8 @@ namespace graphics
 		} else {
 			tex->initialize(img);
 			m_texture_sources[tex.get()].res_name = filename;
+			// Кэшируем текстуру
+			cache().cache_obj(cache_key, tex);
 		}
 		// Запоминаем указатель на текстуру
 		m_textures.push_back(TextureWPtr(tex));

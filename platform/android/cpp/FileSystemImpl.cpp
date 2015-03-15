@@ -3,6 +3,8 @@
 #include <android/asset_manager_jni.h>
 #include <utils/JString.hpp>
 #include <utils/log.hpp>
+#include <utils/bytearray.hpp>
+#include <memory/Cache.hpp>
 
 
 std::string FileSystem::resources_path()
@@ -22,8 +24,18 @@ std::string FileSystem::resources_path()
 }
 
 
-bool FileSystem::load_asset(const std::string& path, utils::bytearray& data)
+utils::bytearray_sptr_t FileSystem::load_asset(const std::string& path)
 {
+	// Ключ кэширования
+	const std::string cache_key("a:" + path);
+	
+	// Пытаемся найти данные в кэше
+	utils::bytearray_sptr_t ret = cache().get_obj<utils::bytearray_sptr_t>(cache_key);
+	
+	// Если нашли, возвращаем их
+	if (ret) return ret;
+	
+	// Данные в кэше не найдены, пытаемся загрузить их из файла
 	jni::JEnv jenv;
 	
 	const jclass jc_activity = jni::get_class("com/eosproject/eos/EOSActivity");
@@ -41,7 +53,7 @@ bool FileSystem::load_asset(const std::string& path, utils::bytearray& data)
 	AAsset* asset = AAssetManager_open(mgr, path.c_str(), AASSET_MODE_STREAMING);
 	if (!asset) {
 		LOG(ERR) << "Не удалось открыть файл " << path;
-		return false;
+		return utils::bytearray_sptr_t();
 	}
 	
 	const long int filesize = AAsset_getLength(asset);
@@ -50,12 +62,15 @@ bool FileSystem::load_asset(const std::string& path, utils::bytearray& data)
 	{
 		AAsset_close(asset);
 		LOG(ERR) << "Не удалось прочитать файл " << path;
-		return false;
+		return utils::bytearray_sptr_t();
 	}
 	else
 	{
-		data = buff;
 		AAsset_close(asset);
-		return true;
+		// Кэшируем загруженные данные
+		ret.reset(new utils::bytearray(buff));
+		cache().cache_obj(cache_key, ret);
+		// Возвращаем загруженные данные
+		return ret;
 	}
 }

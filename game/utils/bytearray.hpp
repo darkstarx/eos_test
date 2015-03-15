@@ -35,10 +35,15 @@ namespace utils
 		bytearray(const bytearray& copy): m_ptr(copy.m_ptr), m_size(copy.m_size)
 		{}
 		
-		inline bytearray& operator =(const bytearray& oth)
+		inline void assign(const bytearray &oth)
 		{
 			m_ptr = oth.m_ptr;
 			m_size = oth.m_size;
+		}
+		
+		inline bytearray& operator=(const bytearray &oth)
+		{
+			assign(oth);
 			return *this;
 		}
 		
