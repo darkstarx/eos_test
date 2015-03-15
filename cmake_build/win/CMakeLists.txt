@@ -19,6 +19,7 @@ file(GLOB SRC_GAME ${PROJECT_DIR}/game/*.hpp ${PROJECT_DIR}/game/*.cpp)
 file(GLOB SRC_GAME_GRAPHICS ${PROJECT_DIR}/game/graphics/*.hpp ${PROJECT_DIR}/game/graphics/*.cpp)
 file(GLOB SRC_GAME_RESOURCES ${PROJECT_DIR}/game/resources/*.hpp ${PROJECT_DIR}/game/resources/*.cpp)
 file(GLOB SRC_GAME_UTILS ${PROJECT_DIR}/game/utils/*.hpp ${PROJECT_DIR}/game/utils/*.cpp)
+file(GLOB SRC_GAME_MEMORY ${PROJECT_DIR}/game/memory/*.hpp ${PROJECT_DIR}/game/memory/*.cpp)
 
 set(SOURCE_FILES
 	${SRC_PLATFORM}
@@ -27,6 +28,7 @@ set(SOURCE_FILES
 	${SRC_GAME_GRAPHICS}
 	${SRC_GAME_RESOURCES}
 	${SRC_GAME_UTILS}
+	${SRC_GAME_MEMORY}
 )
 
 source_group("platform" FILES ${SRC_PLATFORM} ${SRC_DESKTOP})
@@ -34,6 +36,7 @@ source_group("game" FILES ${SRC_GAME})
 source_group("game\\graphics" FILES ${SRC_GAME_GRAPHICS})
 source_group("game\\resources" FILES ${SRC_GAME_RESOURCES})
 source_group("game\\utils" FILES ${SRC_GAME_UTILS})
+source_group("game\\memory" FILES ${SRC_GAME_MEMORY})
 
 # Find OpenGL
 find_package(OpenGL REQUIRED)

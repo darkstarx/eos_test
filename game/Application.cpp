@@ -6,7 +6,8 @@
 #include <graphics/GImage.hpp>
 #include <resources/FileSystem.hpp>
 #include <utils/log.hpp>
-#include "utils/task_queue.hpp"
+#include <utils/task_queue.hpp>
+#include <memory/Cache.hpp>
 
 
 Application* Application::m_instance = NULL;
@@ -38,6 +39,9 @@ void Application::start()
 {
 	if (!m_stopped) return;
 	m_stopped = false;
+	// Ставим задачу на периодическую очистку кэша (раз в три секунды)
+	m_task_cache_clean = m_task_queue->enqueue_repeatedly(std::bind(&Application::clean_cache, this), 3.0);
+	
 	DLOG(INFO) << "Application started";
 }
 
@@ -46,6 +50,9 @@ void Application::stop()
 {
 	if (m_stopped) return;
 	m_stopped = true;
+	// Удаляем задачу на периодическую очистку кэша
+	m_task_queue->unqueue(m_task_cache_clean);
+	
 	DLOG(INFO) << "Application stopped";
 }
 
@@ -81,7 +88,12 @@ void Application::on_graphics_created()
 	graphics::TextureSPtr tex = texmgr().get_texture_from_asset("test.png");
 	m_img->set_image(tex);
 	
+	m_img2.reset(new graphics::GImage(graphics::rectangle_t(520, 350, 300, 200)));
+	graphics::TextureSPtr tex2 = texmgr().get_texture_from_asset("test.png");
+	m_img2->set_image(tex2);
+	
 	m_scene->add_object(m_img);
+	m_scene->add_object(m_img2);
 	m_scene->add_object(m_rect);
 	
 	m_task = m_task_queue->enqueue_repeatedly(std::bind(&Application::rotate_rect, this), 1.0 / 60.0);
@@ -136,4 +148,10 @@ Application::Application()
 Application::~Application()
 {
 	DLOG(INFO) << "Application destroyed";
+}
+
+
+void Application::clean_cache()
+{
+	cache().clean();
 }

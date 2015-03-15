@@ -8,7 +8,7 @@
 namespace jni
 {
 	
-	/** @brief Обертка над синглтоном java-окружения
+	/** \brief Обертка над синглтоном java-окружения
 	 */
 	struct JEnv
 	{

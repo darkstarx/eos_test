@@ -8,8 +8,8 @@ std::string FileSystem::resources_path()
 }
 
 
-bool FileSystem::load_asset(const std::string& path, utils::bytearray& data)
+utils::bytearray_sptr_t FileSystem::load_asset(const std::string& path)
 {
 	const std::string full_path = m_assets_path + path;
-	return load_from_file(full_path, data);
+	return load_from_file(full_path);
 }

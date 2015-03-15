@@ -2,7 +2,7 @@
 #define RESOURCES_IMAGELOADER_HPP
 
 #include <resources/forwards.hpp>
-#include <utils/bytearray.hpp>
+#include <utils/forwards.hpp>
 
 
 /** \brief Статический класс для загрузки изображений
@@ -30,7 +30,7 @@ public:
 private:
 	/** \brief Выполнить декодирование изображения
 	 */
-	static resources::ImageSPtr decode(const utils::bytearray &encoded, const std::string &desc);
+	static resources::ImageSPtr decode(const utils::bytearray_sptr_t &encoded, const std::string &desc);
 };
 
 #endif // RESOURCES_IMAGELOADER_HPP

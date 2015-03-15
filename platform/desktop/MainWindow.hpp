@@ -10,7 +10,7 @@
 #define WINDOW_HEIGHT 720
 
 
-/** @brief Статический класс главного окна приложения
+/** \brief Статический класс главного окна приложения
  */
 class MainWindow
 {
@@ -29,7 +29,7 @@ private:
 	static void stop_rendering();
 	
 public:
-	/** @brief Создать главное окно приложения
+	/** \brief Создать главное окно приложения
 	 */
 	static int create_window();
 };

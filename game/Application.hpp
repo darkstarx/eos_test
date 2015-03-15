@@ -74,19 +74,25 @@ public:
 	
 private:
 	static Application* m_instance;
-	utils::task_queue_sptr m_task_queue;
-	bool m_paused;					///< Признак приостановки работы приложения
-	bool m_stopped;					///< Признак остановки работы приложения
+	utils::task_queue_sptr m_task_queue;	///< Очередь задач игрового потока
+	bool m_paused;							///< Признак приостановки работы приложения
+	bool m_stopped;							///< Признак остановки работы приложения
+	utils::task_wptr_t m_task_cache_clean;	///< Задача на периодическую очистку кэша
 	
 	graphics::GContainerSPtr m_scene;
 	graphics::GRectangleSPtr m_rect;
 	graphics::GImageSPtr m_img;
+	graphics::GImageSPtr m_img2;
 	utils::task_wptr_t m_task;
 	void rotate_rect();
 	
 	Application();
 	
 	~Application();
+	
+	/** \brief Выполнить очистку кэша
+	 */
+	void clean_cache();
 };
 
 inline void app_create() { Application::create(); }

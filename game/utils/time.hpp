@@ -12,6 +12,11 @@
 namespace utils
 {
 	
+#define sec_from_days(days) ((days) * sec_from_hours(24))
+#define sec_from_hours(hours) ((hours) * sec_from_minutes(60))
+#define sec_from_minutes(minutes) ((minutes) * 60)
+	
+	
 	/** \brief Получить текущее время в секундах с начала эпохи (1970-01-01 00:00:00 +0000 (UTC))
 	 */
 	inline double get_time()
