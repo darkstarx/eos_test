@@ -2,6 +2,7 @@
 #define GRAPHICS_TEXTURE_H
 
 #include <graphics/gl.hpp>
+#include <graphics/types.hpp>
 #include <resources/forwards.hpp>
 #include <utils/enable_shared_from_this.hpp>
 #include <string>
@@ -38,6 +39,10 @@ namespace graphics
 		/** \brief Получить идентификатор текстуры
 		 */
 		inline GLuint id() { return m_id; }
+
+		/** \brief Получить размеры тестуры
+		*/
+		inline dimension_t& dimension() { return m_dimension; }
 		
 		/** \brief Установить текстурный юнит, к которому привязывается текстура
 		 */
@@ -52,9 +57,10 @@ namespace graphics
 		inline GLint unit_index() { return m_unit - GL_TEXTURE0; }
 		
 	private:
-		bool m_initialized;	///< Признак того, что текстура инициализирована
-		GLuint m_id;		///< Идентификатор текстуры
-		GLenum m_unit;		///< Текстурный юнит, для которого предназначена данная текстура
+		bool m_initialized;	      ///< Признак того, что текстура инициализирована
+		GLuint m_id;		      ///< Идентификатор текстуры
+		GLenum m_unit;		      ///< Текстурный юнит, для которого предназначена данная текстура
+		dimension_t m_dimension;  ///< Размеры текстуры
 	};
 	
 }

@@ -157,7 +157,7 @@ namespace graphics
 		if (!!m_transform_point) matrix().translate(m_transform_point);
 		// Масштабируем объект
 		matrix().scale(scale());
-		// Попорачиваем объект
+		// Поворачиваем объект
 		matrix().rotate(rotation());
 		// Смещаем объект в точку трансформации
 		if (!!m_transform_point) matrix().translate(-m_transform_point.x, -m_transform_point.y, -m_transform_point.z);

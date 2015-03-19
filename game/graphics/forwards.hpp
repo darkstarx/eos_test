@@ -35,6 +35,10 @@ namespace graphics
 	typedef std::shared_ptr<GImage> GImageSPtr;
 	typedef std::weak_ptr<GImage> GImageWPtr;
 	
+	class GImages;
+	typedef std::shared_ptr<GImages> GImagesSPtr;
+	typedef std::weak_ptr<GImages> GImagesWPtr;
+	
 	class Texture;
 	typedef Texture* TexturePtr;
 	typedef std::shared_ptr<Texture> TextureSPtr;

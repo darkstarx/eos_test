@@ -80,7 +80,19 @@ namespace graphics
 	inline bool operator !=(const rectangle_t &lhs, const rectangle_t &rhs)
 	{ return !(lhs == rhs); }
 	
-	
+
+	struct region_t
+	{
+		rectangle_t rect;     ///< Определяет координаты вершин региона
+		rectangle_t img_rect; ///< Определяет текстурные координаты изображения
+		rectangle_t msk_rect; ///< Определяет текстурные коордианты маски
+
+		region_t() : rect(rectangle_t()), img_rect(rectangle_t()), msk_rect(rectangle_t()) {}
+		explicit region_t(const rectangle_t& rect, const rectangle_t& img_rect, const rectangle_t& msk_rect) : rect(rect), img_rect(img_rect), msk_rect(msk_rect) {}
+		~region_t() {}
+	};
+
+
 	struct box_t : public position_t, public dimension_t
 	{
 		box_t() : position_t(), dimension_t() {}

@@ -4,6 +4,7 @@
 #include <graphics/GContainer.hpp>
 #include <graphics/GRectangle.hpp>
 #include <graphics/GImage.hpp>
+#include <graphics/GImages.hpp>
 #include <resources/FileSystem.hpp>
 #include <utils/log.hpp>
 #include <utils/task_queue.hpp>
@@ -88,12 +89,14 @@ void Application::on_graphics_created()
 	graphics::TextureSPtr tex = texmgr().get_texture_from_asset("test.png");
 	m_img->set_image(tex);
 	
-	m_img2.reset(new graphics::GImage(graphics::rectangle_t(520, 350, 300, 200)));
-	graphics::TextureSPtr tex2 = texmgr().get_texture_from_asset("test.png");
-	m_img2->set_image(tex2);
+	m_imgs.reset(new graphics::GImages(graphics::position_t()));
+	m_imgs->set_image(tex);
+	m_imgs->add_region(graphics::region_t(graphics::rectangle_t(0, 0, 100, 100), graphics::rectangle_t(200, 250, 300, 300), graphics::rectangle_t(0, 0, 0, 0)));
+	m_imgs->add_region(graphics::region_t(graphics::rectangle_t(150, 150, 130, 100), graphics::rectangle_t(150, 70, 260, 200), graphics::rectangle_t(0, 0, 0, 0)));
+	m_imgs->set_transform_point(graphics::position_t(140.0f, 125.0f));
 	
 	m_scene->add_object(m_img);
-	m_scene->add_object(m_img2);
+	m_scene->add_object(m_imgs);
 	m_scene->add_object(m_rect);
 	
 	m_task = m_task_queue->enqueue_repeatedly(std::bind(&Application::rotate_rect, this), 1.0 / 60.0);
@@ -133,6 +136,7 @@ void Application::rotate_rect()
 	rot.angle_z += 0.8f;
 	if (rot.angle_z > 360.0f) rot.angle_z = 0.0f;
 	m_rect->set_rotation(rot);
+	m_imgs->set_rotation(graphics::rotation_t(0.0f, 0.0f, -rot.angle_z));
 }
 
 

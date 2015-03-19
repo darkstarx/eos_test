@@ -82,7 +82,7 @@ private:
 	graphics::GContainerSPtr m_scene;
 	graphics::GRectangleSPtr m_rect;
 	graphics::GImageSPtr m_img;
-	graphics::GImageSPtr m_img2;
+	graphics::GImagesSPtr m_imgs;
 	utils::task_wptr_t m_task;
 	void rotate_rect();
 	

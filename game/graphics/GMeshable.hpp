@@ -51,7 +51,7 @@ namespace graphics
 		virtual void update_indices();
 		
 	protected:
-		/** \brief Выполнитть действия перед отрисовкой
+		/** \brief Выполнить действия перед отрисовкой
 		 */
 		virtual void before_draw();
 		
