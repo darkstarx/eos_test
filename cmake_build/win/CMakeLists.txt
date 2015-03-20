@@ -13,7 +13,24 @@ set(DESKTOP_DIR ${PROJECT_DIR}/platform/desktop)
 # Point to our own cmake modules
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_DIR}/cmake_modules)
 
-file(GLOB SRC_PLATFORM ${PROJECT_DIR}/platform/win/*.h ${PROJECT_DIR}/platform/win/*.c ${PROJECT_DIR}/platform/win/*.hpp ${PROJECT_DIR}/platform/win/*.cpp)
+file(GLOB SRC_PLATFORM
+	${PROJECT_DIR}/platform/win/*.h
+	${PROJECT_DIR}/platform/win/*.c
+	${PROJECT_DIR}/platform/win/*.hpp
+	${PROJECT_DIR}/platform/win/*.cpp
+)
+file(GLOB SRC_PLATFORM_UTILS
+	${PROJECT_DIR}/platform/win/utils/*.h
+	${PROJECT_DIR}/platform/win/utils/*.c
+	${PROJECT_DIR}/platform/win/utils/*.hpp
+	${PROJECT_DIR}/platform/win/utils/*.cpp
+)
+file(GLOB SRC_PLATFORM_MEMORY
+	${PROJECT_DIR}/platform/win/memory/*.h
+	${PROJECT_DIR}/platform/win/memory/*.c
+	${PROJECT_DIR}/platform/win/memory/*.hpp
+	${PROJECT_DIR}/platform/win/memory/*.cpp
+)
 file(GLOB SRC_DESKTOP ${PROJECT_DIR}/platform/desktop/*.hpp ${PROJECT_DIR}/platform/desktop/*.cpp)
 file(GLOB SRC_GAME ${PROJECT_DIR}/game/*.hpp ${PROJECT_DIR}/game/*.cpp)
 file(GLOB SRC_GAME_GRAPHICS ${PROJECT_DIR}/game/graphics/*.hpp ${PROJECT_DIR}/game/graphics/*.cpp)
@@ -23,6 +40,8 @@ file(GLOB SRC_GAME_MEMORY ${PROJECT_DIR}/game/memory/*.hpp ${PROJECT_DIR}/game/m
 
 set(SOURCE_FILES
 	${SRC_PLATFORM}
+	${SRC_PLATFORM_UTILS}
+	${SRC_PLATFORM_MEMORY}
 	${SRC_DESKTOP}
 	${SRC_GAME}
 	${SRC_GAME_GRAPHICS}
@@ -32,6 +51,8 @@ set(SOURCE_FILES
 )
 
 source_group("platform" FILES ${SRC_PLATFORM} ${SRC_DESKTOP})
+source_group("platform\\utils" FILES ${SRC_PLATFORM_UTILS})
+source_group("platform\\memory" FILES ${SRC_PLATFORM_MEMORY})
 source_group("game" FILES ${SRC_GAME})
 source_group("game\\graphics" FILES ${SRC_GAME_GRAPHICS})
 source_group("game\\resources" FILES ${SRC_GAME_RESOURCES})

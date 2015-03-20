@@ -46,7 +46,7 @@ namespace graphics
 		
 		TextureManager& operator=(const TextureManager&) = delete;
 		
-		static bool is_alive() { return m_instance; }
+		static bool is_alive() { return m_instance != 0; }
 		
 		static TextureManager& instance();
 		

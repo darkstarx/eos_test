@@ -105,7 +105,6 @@ namespace graphics
 	, has_ext_rgb8(false)
 	, server_caps()
 	{
-		GLint iarr[4];
 		GLfloat farr[4];
 		
 		{
@@ -197,7 +196,7 @@ namespace graphics
 		// поэтому можно их считать одинаковыми
 		has_ext_texture_npot = extensions.count("GL_ARB_TEXTURE_NON_POWER_OF_TWO") || extensions.count("GL_OES_TEXTURE_NPOT");
 		// проверка, поддерживается ли расширение GL_OES_rgb8_rgba8 - для полноцветного рендербуфера
-		has_ext_rgb8 = extensions.count("GL_OES_RGB8_RGBA8");
+		has_ext_rgb8 = extensions.count("GL_OES_RGB8_RGBA8") > 0;
 	}
 	
 	
@@ -638,7 +637,7 @@ namespace graphics
 	
 	void Context::set_viewport(const rectangle_t& value)
 	{
-		glViewport(value.x, value.y, value.w, value.h);
+		glViewport(static_cast<int>(value.x), static_cast<int>(value.y), static_cast<int>(value.w), static_cast<int>(value.h));
 		check_gl_err();
 	}
 	

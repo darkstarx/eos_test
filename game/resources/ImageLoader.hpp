@@ -3,6 +3,7 @@
 
 #include <resources/forwards.hpp>
 #include <utils/forwards.hpp>
+#include <string>
 
 
 /** \brief Статический класс для загрузки изображений

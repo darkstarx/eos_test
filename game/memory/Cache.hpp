@@ -88,7 +88,7 @@ namespace memory
 		
 		Cache& operator=(const Cache&) = delete;
 		
-		static bool is_alive() { return m_instance; }
+		static bool is_alive() { return m_instance != 0; }
 		
 		static Cache& instance();
 		

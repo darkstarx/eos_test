@@ -40,7 +40,7 @@ namespace graphics
 		
 		Renderer& operator=(const Renderer&) = delete;
 		
-		static bool is_alive() { return m_instance; }
+		static bool is_alive() { return m_instance != 0; }
 		
 		static Renderer& instance();
 		

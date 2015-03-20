@@ -161,11 +161,13 @@ namespace graphics
 	
 	TextureManager::TextureManager()
 	{
+		LOG(INFO) << "Texture manager created";
 	}
 	
 	
 	TextureManager::~TextureManager()
 	{
+		LOG(INFO) << "Texture manager destroyed";
 	}
 	
 }
