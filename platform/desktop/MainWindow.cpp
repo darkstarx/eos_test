@@ -87,7 +87,7 @@ void MainWindow::graphics_worker()
 		++frames;
 		const std::chrono::milliseconds check_time(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - check_point));
 		if (check_time.count() >= 1000) {
-			DLOG(INFO) << "fps: " << frames;
+// 			DLOG(INFO) << "fps: " << frames;
 			frames = 0;
 			check_point = std::chrono::system_clock::now();
 		}

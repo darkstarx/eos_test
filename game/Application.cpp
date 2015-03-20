@@ -89,7 +89,7 @@ void Application::on_graphics_created()
 	graphics::TextureSPtr tex = texmgr().get_texture_from_asset("test.png");
 	m_img->set_image(tex);
 	
-	m_imgs.reset(new graphics::GImages(graphics::position_t()));
+	m_imgs.reset(new graphics::GImages(graphics::position_t(140.0f, 125.0f)));
 	m_imgs->set_image(tex);
 	m_imgs->add_region(graphics::region_t(graphics::rectangle_t(0, 0, 100, 100), graphics::rectangle_t(200, 250, 300, 300), graphics::rectangle_t(0, 0, 0, 0)));
 	m_imgs->add_region(graphics::region_t(graphics::rectangle_t(150, 150, 130, 100), graphics::rectangle_t(150, 70, 260, 200), graphics::rectangle_t(0, 0, 0, 0)));

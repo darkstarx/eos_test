@@ -40,6 +40,14 @@ namespace graphics
 		 */
 		inline const color_t& color() const { return m_color; }
 		
+		/** \brief Установить уровень непрозрачности объекта
+		 */
+		void set_opacity(opacity_t value);
+		
+		/** \brief Получить уровень непрозрачности объекта
+		 */
+		inline opacity_t opacity() const { return m_color.a; }
+		
 		/** \brief Установить центр трансформации
 		 */
 		void set_transform_point(const position_t &value);

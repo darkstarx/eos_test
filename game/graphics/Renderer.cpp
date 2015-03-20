@@ -98,7 +98,7 @@ namespace graphics
 		// добиваемся того, что ось Z направлена от экрана в глубину, а не наоборот.
 		matrix().look_at(position_t(0.0f, 0.0f, 0.0f), position_t(0.0f, 0.0f, 1.0f), position_t(0.0f, 1.0f, 0.0f));
 */
-		matrix().ortho(0.0f, static_cast<GLfloat>(width), 0.0f, static_cast<GLfloat>(height), -100.0f, 100.0f);
+		matrix().ortho(0.0f, static_cast<GLfloat>(width), static_cast<GLfloat>(height), 0.0f, -100.0f, 100.0f);
 	}
 	
 	

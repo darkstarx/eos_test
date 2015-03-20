@@ -150,6 +150,7 @@ namespace graphics
 	inline bool operator !=(const scale_t &lhs, const scale_t &rhs)
 	{ return !(lhs == rhs); }
 	
+	typedef GLfloat opacity_t;
 	
 	struct color_t
 	{

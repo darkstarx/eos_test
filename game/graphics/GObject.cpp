@@ -39,6 +39,15 @@ namespace graphics
 	}
 	
 	
+	void GObject::set_opacity(opacity_t value)
+	{
+		if (m_color.a == value) return;
+		utils::scoped_lock guard(m_lock);
+		m_color.a = value;
+		invalidate();
+	}
+	
+	
 	void GObject::set_transform_point(const position_t& value)
 	{
 		if (m_transform_point == value) return;

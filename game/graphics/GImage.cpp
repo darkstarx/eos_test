@@ -112,16 +112,16 @@ namespace graphics
 		GLfloat *cursor = m_vertices.get();
 		
 		*cursor++ = 0.0f;
-		*cursor++ = 0.0f;
-		
-		*cursor++ = m_rect.w;
-		*cursor++ = 0.0f;
+		*cursor++ = m_rect.h;
 		
 		*cursor++ = m_rect.w;
 		*cursor++ = m_rect.h;
 		
+		*cursor++ = m_rect.w;
 		*cursor++ = 0.0f;
-		*cursor++ = m_rect.h;
+		
+		*cursor++ = 0.0f;
+		*cursor++ = 0.0f;
 		
 		super::update_vertices();
 	}

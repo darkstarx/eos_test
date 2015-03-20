@@ -170,16 +170,16 @@ namespace graphics
 			const rectangle_t& rect = it->rect;
 			
 			*cursor++ = rect.x;
-			*cursor++ = rect.y;
-			
-			*cursor++ = rect.x + rect.w;
-			*cursor++ = rect.y;
+			*cursor++ = rect.y + rect.h;
 			
 			*cursor++ = rect.x + rect.w;
 			*cursor++ = rect.y + rect.h;
+			
+			*cursor++ = rect.x + rect.w;
+			*cursor++ = rect.y;
 			
 			*cursor++ = rect.x;
-			*cursor++ = rect.y + rect.h;
+			*cursor++ = rect.y;
 		}
 		
 		super::update_vertices();
