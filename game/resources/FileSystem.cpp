@@ -24,20 +24,10 @@
 #endif
 
 
-FileSystem *FileSystem::m_instance = NULL;
-FileSystemDestroyer FileSystem::m_destroyer;
-
-
-/** \class FileSystemDestroyer */
-
-FileSystemDestroyer::~FileSystemDestroyer()
-{
-	delete m_instance;
-}
-
-
-
 /** \class FileSystem */
+
+FileSystem *FileSystem::m_instance = NULL;
+
 
 FileSystem::FileSystem()
 : m_resource_path(RESOURCES_PATH)
@@ -53,13 +43,24 @@ FileSystem::~FileSystem()
 }
 
 
+void FileSystem::create()
+{
+	ASSERT(!m_instance) << "Создание уже существующего экземпляра доступа к файловой системе!";
+	m_instance = new FileSystem();
+}
+
+
+void FileSystem::destroy()
+{
+	ASSERT(m_instance) << "Попытка разрушить не созданный экземпляр доступа к файловой системе!";
+	delete m_instance;
+	m_instance = 0;
+}
+
+
 FileSystem& FileSystem::instance()
 {
-	if (!m_instance)
-	{
-		m_instance = new FileSystem();
-		m_destroyer.init(m_instance);
-	}
+	ASSERT(m_instance) << "Попытка обращения к отсутствующему экземпляру файловой системы!";
 	return *m_instance;
 }
 

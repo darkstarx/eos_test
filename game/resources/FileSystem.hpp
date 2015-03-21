@@ -9,24 +9,9 @@
 #include <utils/forwards.hpp>
 
 
-class FileSystem;
-
-
-class FileSystemDestroyer
-{
-public:
-	~FileSystemDestroyer();
-	inline void init(FileSystem *instance) { ASSERT(!m_instance); m_instance = instance; }
-private:
-	FileSystem *m_instance;
-};
-
-
 class FileSystem
 {
 private:
-	friend class FileSystemDestroyer;
-	
 	FileSystem();
 	
 	~FileSystem();
@@ -36,6 +21,20 @@ public:
 	
 	FileSystem& operator=(const FileSystem&) = delete;
 	
+	/** \brief Создать экземпляр доступа к файловой системе
+	 */
+	static void create();
+	
+	/** \brief Разрушить экземпляр доступа к файловой системе
+	 */
+	static void destroy();
+	
+	/** \brief Проверить, что экземпляр доступа к файловой системе создан
+	 */
+	static bool is_alive() { return m_instance != 0; }
+	
+	/** \brief Получить экземпляр доступа к файловой системе
+	 */
 	static FileSystem& instance();
 	
 	std::string resources_path();
@@ -67,7 +66,6 @@ public:
 	
 private:
 	static FileSystem *m_instance;
-	static FileSystemDestroyer m_destroyer;
 	
 	std::string m_resource_path;
 	std::string m_assets_path;

@@ -67,6 +67,12 @@ namespace graphics
 	}
 	
 	
+	void Renderer::reset_graphics()
+	{
+		set_graphics(GContainerSPtr());
+	}
+	
+	
 	void Renderer::invalidate()
 	{
 		utils::scoped_lock guard(m_graphics_lock);

@@ -8,30 +8,29 @@
 namespace graphics
 {
 	
-	/** \class TextureManagerDestroyer */
-	
-	TextureManagerDestroyer::~TextureManagerDestroyer()
-	{
-		ASSERT(m_instance);
-		m_instance->m_instance = NULL;
-		delete m_instance;
-	}
-	
-	
-	
 	/** \class TextureManager */
 	
 	TextureManager* TextureManager::m_instance = NULL;
-	TextureManagerDestroyer TextureManager::m_destroyer;
+	
+	
+	void TextureManager::create()
+	{
+		ASSERT(!m_instance) << "Повторное создание текстурного менеджера!";
+		m_instance = new TextureManager();
+	}
+	
+	
+	void TextureManager::destroy()
+	{
+		ASSERT(m_instance) << "Попытка разрушить не созданный текстурный менеджер!";
+		delete m_instance;
+		m_instance = 0;
+	}
 	
 	
 	TextureManager& TextureManager::instance()
 	{
-		if (!m_instance)
-		{
-			m_instance = new TextureManager();
-			m_destroyer.init(m_instance);
-		}
+		ASSERT(m_instance) << "Попытка обращения к отсутствующему текстурному менеджеру!";
 		return *m_instance;
 	}
 	

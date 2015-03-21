@@ -145,12 +145,35 @@ Application::Application()
 , m_paused(true)
 , m_stopped(true)
 {
+	// Приложение создано
 	DLOG(INFO) << "Application created";
+	// Создаем кэш
+	memory::Cache::create();
+	// Создаем экземпляр доступа к файловой системе
+	FileSystem::create();
+	// Создаем текстурный менеджер
+	graphics::TextureManager::create();
 }
 
 
 Application::~Application()
 {
+	// Разрушаем сцену
+	m_scene.reset();
+	m_img.reset();
+	m_imgs.reset();
+	m_rect.reset();
+	// Прекращаем отрисовку сцены
+	renderer().reset_graphics();
+	// Полностью очищаем кэш
+	cache().force_clean();
+	// Разрушаем текстурный менеджер
+	graphics::TextureManager::destroy();
+	// Разрушаем экземпляр доступа к файловой системе
+	FileSystem::destroy();
+	// Разрушаем кэш
+	memory::Cache::destroy();
+	// Приложение разрушено
 	DLOG(INFO) << "Application destroyed";
 }
 

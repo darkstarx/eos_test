@@ -40,16 +40,32 @@ namespace graphics
 		
 		Renderer& operator=(const Renderer&) = delete;
 		
+		/** \brief Проверить, что отрисовщик создан
+		 */
 		static bool is_alive() { return m_instance != 0; }
 		
+		/** \brief Получить экземпляр отрисовщика
+		 */
 		static Renderer& instance();
 		
+		/** \brief Обработать событие создания графического контекста
+		 */
 		void on_ctx_create();
 		
+		/** \brief Обработать событие разрушения графического контекста
+		 */
 		void on_ctx_destroy();
 		
+		/** \brief Установить первичный графический контейнер (сцену) для отрисовки
+		 */
 		void set_graphics(const GContainerSPtr &container);
 		
+		/** \brief Убрать первичный графический контейнер (сцену) из отрисовки
+		 */
+		void reset_graphics();
+		
+		/** \brief Получить текущий первичный графический контейнер (сцену)
+		 */
 		inline GContainerSPtr graphics() { return m_graphics; }
 		
 		void invalidate();

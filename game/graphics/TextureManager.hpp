@@ -11,19 +11,6 @@
 namespace graphics
 {
 	
-	class TextureManager;
-	
-	/** \brief Вспомогательный класс для автоматического разрушения текстурного менеджера
-	 */
-	class TextureManagerDestroyer
-	{
-	public:
-		~TextureManagerDestroyer();
-		inline void init(TextureManager *instance) { ASSERT(!m_instance); m_instance = instance; }
-	private:
-		TextureManager *m_instance;
-	};
-	
 	/** \brief Источник изображения для текстуры
 	 */
 	struct texture_source
@@ -37,7 +24,6 @@ namespace graphics
 	class TextureManager
 	{
 	private:
-		friend class TextureManagerDestroyer;
 		typedef std::list<TextureWPtr> textures_t;
 		typedef std::map<TexturePtr, texture_source> texture_sources_t;
 		
@@ -46,8 +32,20 @@ namespace graphics
 		
 		TextureManager& operator=(const TextureManager&) = delete;
 		
+		/** \brief Создать текстурный менеджер
+		 */
+		static void create();
+		
+		/** \brief Разрушить текстурный менеджер
+		 */
+		static void destroy();
+		
+		/** \brief Проверить, что текстурный менеджер создан
+		 */
 		static bool is_alive() { return m_instance != 0; }
 		
+		/** \brief Получить экземпляр текстурного менеджера
+		 */
 		static TextureManager& instance();
 		
 		/** \brief Получить текстуру по имени ассета
@@ -72,7 +70,6 @@ namespace graphics
 		
 	private:
 		static TextureManager* m_instance;			///< Единственный экземпляр менеджера
-		static TextureManagerDestroyer m_destroyer;	///< Разрушитель экземпляра менеджера
 		
 		textures_t m_textures;						///< Список слабых указателей на все объекты текстур
 		texture_sources_t m_texture_sources;		///< Источники изображений для текстур

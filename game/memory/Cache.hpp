@@ -10,26 +10,10 @@
 namespace memory
 {
 	
-	class Cache;
-	
-	
-	class CacheDestroyer
-	{
-	public:
-		~CacheDestroyer();
-		inline void init(Cache *instance) { ASSERT(!m_instance); m_instance = instance; }
-	private:
-		Cache *m_instance;
-	};
-	
-	
 	/** \brief Кэш объектов
 	 */
 	class Cache
 	{
-	private:
-		friend class CacheDestroyer;
-		
 	private:
 		template <class> struct CleanerS;
 		template <class> struct CleanerW;
@@ -88,8 +72,20 @@ namespace memory
 		
 		Cache& operator=(const Cache&) = delete;
 		
+		/** \brief Создать кэш
+		 */
+		static void create();
+		
+		/** \brief Разрушить кэш
+		 */
+		static void destroy();
+		
+		/** \brief Проверить, что кэш создан
+		 */
 		static bool is_alive() { return m_instance != 0; }
 		
+		/** \brief Получить экземпляр кэша
+		 */
 		static Cache& instance();
 		
 		/** \brief Поместить объект в кэш
@@ -131,7 +127,6 @@ namespace memory
 		
 	private:
 		static Cache* m_instance;			///< Единственный экземпляр отрисовщика
-		static CacheDestroyer m_destroyer;	///< Разрушитель экземпляра рендерера
 		texture_cache_t m_textures;			///< Кэш текстур
 		bytearray_cache_t m_bytearrays;		///< Кэш наборов данных
 		

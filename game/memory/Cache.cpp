@@ -5,18 +5,8 @@
 namespace memory
 {
 	
-	/** \class CacheDestroyer */
-	
-	CacheDestroyer::~CacheDestroyer()
-	{
-		ASSERT(m_instance);
-		m_instance->m_instance = NULL;
-		delete m_instance;
-	}
-	
-	
-	
-	/** \brief Чистильщик кэша, удерживающего объекты
+	/** \struct Cache::CleanerS
+	 * \brief Чистильщик кэша, удерживающего объекты
 	 * Используется для определения, может ли объект в данный момент быть удален из кэша.
 	 */
 	template <class T>
@@ -41,7 +31,8 @@ namespace memory
 	
 	
 	
-	/** \brief Чистильщик кэша, не удерживающего объекты 
+	/** \struct Cache::CleanerW
+	 * \brief Чистильщик кэша, не удерживающего объекты 
 	 * Используется для определения, может ли объект в данный момент быть удален из кэша.
 	 */
 	template <class T>
@@ -155,16 +146,26 @@ namespace memory
 	/** \class Cache */
 	
 	Cache* Cache::m_instance = NULL;
-	CacheDestroyer Cache::m_destroyer;
+	
+	
+	void Cache::create()
+	{
+		ASSERT(!m_instance) << "Повторное создание кэша!";
+		m_instance = new Cache();
+	}
+	
+	
+	void Cache::destroy()
+	{
+		ASSERT(m_instance) << "Попытка разрушить не созданный кэш!";
+		delete m_instance;
+		m_instance = 0;
+	}
 	
 	
 	Cache& Cache::instance()
 	{
-		if (!m_instance)
-		{
-			m_instance = new Cache();
-			m_destroyer.init(m_instance);
-		}
+		ASSERT(m_instance) << "Попытка обращения к отсутствующему кэшу!";
 		return *m_instance;
 	}
 	

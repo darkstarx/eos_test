@@ -221,7 +221,7 @@ namespace graphics
 		// Пересоздаем шейдеры и заново линкуем шейдерные программы
 		renderer().load_shaders();
 		// Восстанавливаем текстуры
-		texmgr().reload();
+		if (texmgr().is_alive()) texmgr().reload();
 	}
 	
 	
@@ -232,7 +232,7 @@ namespace graphics
 		// Разрушаем шейдеры и удаляем шейдерные программы
 		renderer().release_shaders();
 		// Разрушаем текстуры
-		texmgr().unload();
+		if (texmgr().is_alive()) texmgr().unload();
 		// Создаем неактивный gl-контекст и делаем его текущим
 		m_ctx.reset(new ContextStub());
 	}
