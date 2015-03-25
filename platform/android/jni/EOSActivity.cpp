@@ -81,12 +81,15 @@ extern "C"
 	{
 		jni::JEnv jenv(env, obj);
 		if (surface != 0) {
+			// Получаем новое окно
 			EGLNativeWindowType window = ANativeWindow_fromSurface(env, surface);
 			MainWindow::set_window(window);
 			MainWindow::start_rendering();
 		} else {
 			MainWindow::stop_rendering();
-			ANativeWindow_release(MainWindow::window());
+			if (MainWindow::window()) {
+				ANativeWindow_release(MainWindow::window());
+			}
 		}
 		(void)jenv;
 	}

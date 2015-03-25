@@ -41,6 +41,12 @@ namespace utils
 			m_size = oth.m_size;
 		}
 		
+		inline void reset()
+		{
+			m_ptr.reset();
+			m_size = 0;
+		}
+		
 		inline bytearray& operator=(const bytearray &oth)
 		{
 			assign(oth);

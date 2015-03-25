@@ -15,21 +15,25 @@ namespace resources
 		
 		/** \brief Получить изображение
 		 */
-		inline const utils::bytearray& data() { return m_data; }
+		inline utils::bytearray& data() { return m_data; }
+		
+		/** \brief Получить изображение
+		 */
+		inline const utils::bytearray& data() const { return m_data; }
 		
 		/** \brief Получить ширину изображения в пикселах
 		 */
-		inline unsigned int width() { return m_width; }
+		inline unsigned int width() const { return m_width; }
 		
 		/** \brief Получать высоту изображения в пикселах
 		 */
-		inline unsigned int height() { return m_height; }
+		inline unsigned int height() const { return m_height; }
 		
 		/** \brief Получить кол-во компонентов на пиксел
 		 * Один компонент занимает один байт. Например, в изображении формата RGB один пиксел содержит
 		 * три компонента по одному байту на каждый. А в изображении формата RGBA - четыре компонента.
 		 */
-		inline unsigned char components() { return m_components; }
+		inline unsigned char components() const { return m_components; }
 		
 	private:
 		utils::bytearray m_data;	///< Изображение

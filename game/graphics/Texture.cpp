@@ -65,7 +65,7 @@ namespace graphics
 		
 		// Загружаем изображение в текстуру
 		gl::ctx()->load_texture(GL_TEXTURE_2D, 0, format, image->width(), image->height(), 0, format, GL_UNSIGNED_BYTE, image->data());
-
+		
 		// Устанавливаем размеры текстуры
 		m_dimension.w = image->width();
 		m_dimension.h = image->height();

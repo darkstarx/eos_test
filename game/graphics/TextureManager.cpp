@@ -40,11 +40,11 @@ namespace graphics
 		// Ключ кэширования
 		const std::string cache_key("ta:" + filename);
 		// Пытаемся найти текстуру в кэше
-		graphics::TextureSPtr tex = cache().get_obj<graphics::TextureSPtr>(cache_key);
+		TextureSPtr tex = cache().get_obj<TextureSPtr>(cache_key);
 		// Если текстура найдена, возвращаем её
 		if (tex) return tex;
 		// Создаем объект текстуры
-		tex.reset(new graphics::Texture());
+		tex.reset(new Texture());
 		// Пытаемся загрузить изображение из ассетов
 		resources::ImageSPtr img = ImageLoader::load_from_asset(filename);
 		// Если не удалось загрузить изображение и из ассетов, то оставляем текстуру не инициализированной
@@ -68,11 +68,11 @@ namespace graphics
 		// Ключ кэширования
 		const std::string cache_key("fa:" + filename);
 		// Пытаемся найти текстуру в кэше
-		graphics::TextureSPtr tex = cache().get_obj<graphics::TextureSPtr>(cache_key);
+		TextureSPtr tex = cache().get_obj<TextureSPtr>(cache_key);
 		// Если текстура найдена, возвращаем её
 		if (tex) return tex;
 		// Создаем объект текстуры
-		tex.reset(new graphics::Texture());
+		tex.reset(new Texture());
 		// Пытаемся загрузить изображение из ресурсов
 		resources::ImageSPtr img = ImageLoader::load_from_res(filename);
 		// Если не удалось загрузить изображение и из ресурсов, то оставляем текстуру не инициализированной
@@ -84,6 +84,28 @@ namespace graphics
 			// Кэшируем текстуру
 			cache().cache_obj(cache_key, tex);
 		}
+		// Запоминаем указатель на текстуру
+		m_textures.push_back(TextureWPtr(tex));
+		// Возвращаем объект текстуры
+		return tex;
+	}
+	
+	
+	TextureSPtr TextureManager::create_empty_texture(unsigned int width, unsigned int height, unsigned char components)
+	{
+		// Создаем объект текстуры
+		TextureSPtr tex(new Texture());
+		// Создаем массив, заполненный нулями
+		utils::bytearray data(width * height * static_cast<unsigned int>(components));
+		memset(data, 0, data.size());
+		// Создаем изображение
+		resources::ImageSPtr img(new resources::Image(data, width, height, components));
+		// Инициализируем текстуру
+		tex->initialize(img);
+		// Удаляем нулевые данные (нет смысла их хранить)
+		img->data().reset();
+		// Запоминуем пустое изображение для перезагрузки
+		m_texture_sources[tex.get()].image = img;
 		// Запоминаем указатель на текстуру
 		m_textures.push_back(TextureWPtr(tex));
 		// Возвращаем объект текстуры
@@ -136,6 +158,16 @@ namespace graphics
 				} else {
 					LOG(ERR) << "Не удалось загрузить из ресурсов изображение для текстуры `" << src.res_name << "`";
 				}
+			} else
+			// Если это была изначально пустая текстура
+			if (src.image) {
+				// Заполняем изображение нулями
+				resources::ImageSPtr img = src.image;
+				memset(img->data(), 0, img->data().size());
+				// Инициализируем текстуру нулями
+				texture->initialize(img);
+				// Удаляем нулевые данные (нет смысла их хранить)
+				img->data().reset();
 			} else {
 				// Если ресурс не определен, то текстуру не удастся перезагрузить
 				LOG(ERR) << "Не удалось определить источник изображения для текстуры!";

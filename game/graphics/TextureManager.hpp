@@ -15,8 +15,9 @@ namespace graphics
 	 */
 	struct texture_source
 	{
-		std::string asset_name;	///< Имя файла из ассетов
-		std::string res_name;	///< Имя файла из хранилища ресурсов
+		std::string asset_name;			///< Имя файла из ассетов
+		std::string res_name;			///< Имя файла из хранилища ресурсов
+		resources::ImageSPtr image;		///< Изображение для загрузки в текстуру
 	};
 	
 	/** \brief Текстурный менеджер
@@ -55,6 +56,10 @@ namespace graphics
 		/** \brief Получить текстуру по имени файла
 		 */
 		TextureSPtr get_texture_from_storage(const std::string &filename);
+		
+		/** \brief Создать пустую текстуру, заполненную нулями
+		 */
+		TextureSPtr create_empty_texture(unsigned int width, unsigned int height, unsigned char components);
 		
 		/** \brief Выгрузить все текстуры и освободить память
 		 */

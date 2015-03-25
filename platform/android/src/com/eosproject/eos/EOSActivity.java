@@ -2,9 +2,11 @@ package com.eosproject.eos;
 // https://code.google.com/p/android-native-egl-example/
 
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.widget.RelativeLayout;
 import android.view.Surface;
 import android.view.SurfaceView;
@@ -49,6 +51,14 @@ public class EOSActivity extends Activity implements SurfaceHolder.Callback
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		// Если доступен автоматический поворот экрана при помощи акселерометра
+		if (Settings.System.getInt(getContentResolver(), Settings.System.ACCELEROMETER_ROTATION, 0) == 1) {
+			// Разрешаем только альбомную ориентацию (прямую или перевернутую)
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+		} else {
+			// Разрешаем только прямую альбомную ориентацию
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+		}
 		
 		final Window window = getWindow();
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -102,6 +112,7 @@ public class EOSActivity extends Activity implements SurfaceHolder.Callback
 	}
 	
 	public void surfaceCreated(SurfaceHolder holder) {
+		nativeSetSurface(holder.getSurface());
 	}
 	
 	public void surfaceDestroyed(SurfaceHolder holder) {
@@ -111,6 +122,11 @@ public class EOSActivity extends Activity implements SurfaceHolder.Callback
 	@Override
 	protected void onDestroy()
 	{
+		// Оповещаем приложение о разрушении графики заранее (до фактического разрушения поверхности
+		// и, соответственно, GL-контекста), чтобы приложение смогло обращаться к графическому потоку
+		// для деинициализации графики.
+		nativeSetSurface(null);
+		// Теперь вызываем разрушение приложения
 		nativeOnDestroy();
 		m_layout = null;
 		m_instance = null;
