@@ -18,6 +18,7 @@ file(GLOB SRC_GAME_GRAPHICS ${PROJECT_DIR}/game/graphics/*.hpp ${PROJECT_DIR}/ga
 file(GLOB SRC_GAME_RESOURCES ${PROJECT_DIR}/game/resources/*.hpp ${PROJECT_DIR}/game/resources/*.cpp)
 file(GLOB SRC_GAME_UTILS ${PROJECT_DIR}/game/utils/*.hpp ${PROJECT_DIR}/game/utils/*.cpp)
 file(GLOB SRC_GAME_MEMORY ${PROJECT_DIR}/game/memory/*.hpp ${PROJECT_DIR}/game/memory/*.cpp)
+file(GLOB SRC_GAME_FREETYPE ${PROJECT_DIR}/game/freetype/*.hpp ${PROJECT_DIR}/game/freetype/*.cpp)
 
 set(SOURCE_FILES
 	${SRC_PLATFORM}
@@ -27,6 +28,7 @@ set(SOURCE_FILES
 	${SRC_GAME_RESOURCES}
 	${SRC_GAME_UTILS}
 	${SRC_GAME_MEMORY}
+	${SRC_GAME_FREETYPE}
 )
 
 # Enable CCache
@@ -65,14 +67,16 @@ include_directories(
 	${PROJECT_DIR}/lib/glm
 )
 
+include(${PROJECT_DIR}/cmake_build/common/freetype.cmake)
+include(${PROJECT_DIR}/cmake_build/common/game.cmake)
+
+
 set(EXT_LIBRARIES
 	${OPENGL_LIBRARIES}
 	${SDL2_LIBRARIES}
+	freetype
 	pthread
 )
-
-include(${PROJECT_DIR}/cmake_build/common/game.cmake)
-
 
 list(APPEND GAME_DEFINES
 	__DESKTOP__
@@ -105,7 +109,4 @@ set_target_properties(${PROJECT_NAME}
 	COMPILE_DEFINITIONS "${GAME_DEFINES}"
 )
 # Use gcc 4.8 or higher
-add_definitions(
-    -std=c++11
-)
-
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")

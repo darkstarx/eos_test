@@ -37,6 +37,7 @@ file(GLOB SRC_GAME_GRAPHICS ${PROJECT_DIR}/game/graphics/*.hpp ${PROJECT_DIR}/ga
 file(GLOB SRC_GAME_RESOURCES ${PROJECT_DIR}/game/resources/*.hpp ${PROJECT_DIR}/game/resources/*.cpp)
 file(GLOB SRC_GAME_UTILS ${PROJECT_DIR}/game/utils/*.hpp ${PROJECT_DIR}/game/utils/*.cpp)
 file(GLOB SRC_GAME_MEMORY ${PROJECT_DIR}/game/memory/*.hpp ${PROJECT_DIR}/game/memory/*.cpp)
+file(GLOB SRC_GAME_FREETYPE ${PROJECT_DIR}/game/freetype/*.hpp ${PROJECT_DIR}/game/freetype/*.cpp)
 
 set(SOURCE_FILES
 	${SRC_PLATFORM}
@@ -48,6 +49,7 @@ set(SOURCE_FILES
 	${SRC_GAME_RESOURCES}
 	${SRC_GAME_UTILS}
 	${SRC_GAME_MEMORY}
+	${SRC_GAME_FREETYPE}
 )
 
 source_group("platform" FILES ${SRC_PLATFORM} ${SRC_DESKTOP})
@@ -58,6 +60,7 @@ source_group("game\\graphics" FILES ${SRC_GAME_GRAPHICS})
 source_group("game\\resources" FILES ${SRC_GAME_RESOURCES})
 source_group("game\\utils" FILES ${SRC_GAME_UTILS})
 source_group("game\\memory" FILES ${SRC_GAME_MEMORY})
+source_group("game\\freetype" FILES ${SRC_GAME_FREETYPE})
 
 # Find OpenGL
 find_package(OpenGL REQUIRED)
@@ -103,6 +106,7 @@ set(EXT_LIBRARIES
 	${SDL_LIBRARIES}
 )
 
+include(${PROJECT_DIR}/cmake_build/common/freetype.cmake)
 include(${PROJECT_DIR}/cmake_build/common/game.cmake)
 
 list(APPEND GAME_DEFINES
@@ -110,7 +114,7 @@ list(APPEND GAME_DEFINES
 )
 
 add_executable(${PROJECT_NAME} WIN32 ${SOURCE_FILES})
-target_link_libraries(${PROJECT_NAME} ${EXT_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${EXT_LIBRARIES} freetype)
 
 # Copy built binaries and resources for them into the `bin` directory
 string(REPLACE "/" "\\" PROJECT_DIR_WIN ${PROJECT_DIR})

@@ -34,11 +34,21 @@ set(EXT_LIBRARIES
 	android
 )
 
+include(${PROJECT_DIR}/cmake_build/common/freetype.cmake)
 include(${PROJECT_DIR}/cmake_build/common/game.cmake)
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 
-target_link_libraries(${PROJECT_NAME} ${EXT_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${EXT_LIBRARIES} freetype)
+
+set_target_properties(${PROJECT_NAME}
+	PROPERTIES
+	COMPILE_DEFINITIONS "${GAME_DEFINES}"
+)
+
+# Use gcc 4.8 or higher
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
 
 # Copy built library to android/libs/armeabi and clean out debugging info
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND mkdir -p ${ANDROID_DIR}/libs/${ANDROID_ABI}/)
@@ -71,16 +81,7 @@ set_directory_properties(PROPERTIES
 	ADDITIONAL_MAKE_CLEAN_FILES "${CLEAN_FILES}"
 )
 
-
-set_target_properties(${PROJECT_NAME}
-	PROPERTIES
-	COMPILE_DEFINITIONS "${GAME_DEFINES}"
-)
-
-add_definitions(
-    -std=c++11
-)
-
+# Custom targets
 string(TOLOWER ${CMAKE_BUILD_TYPE} JAVA_BUILD_TYPE)
 
 set(ADB ${ANDROID_SDK}/platform-tools/adb)
