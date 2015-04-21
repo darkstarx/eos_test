@@ -249,6 +249,36 @@ namespace graphics
 		virtual void load_texture(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border,
 			GLenum format, GLenum type, const GLvoid *data) = 0;
 		
+		/** Set pixel storage modes
+		 * \param pname Specifies the symbolic name of the parameter to be set. One value affects the packing of pixel data into memory:
+		 *   GL_PACK_ALIGNMENT. The other affects the unpacking of pixel data from memory: GL_UNPACK_ALIGNMENT.
+		 * \param param Specifies the value that pname is set to.
+		 */
+		virtual void pixel_store(GLenum pname, GLint param) = 0;
+		
+		/** Specify a two-dimensional texture subimage
+		 * \param target Specifies the target to which the texture is bound for glTexSubImage2D. Must be GL_TEXTURE_2D,
+		 *   GL_TEXTURE_CUBE_MAP_POSITIVE_X, GL_TEXTURE_CUBE_MAP_NEGATIVE_X, GL_TEXTURE_CUBE_MAP_POSITIVE_Y, GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+		 *   GL_TEXTURE_CUBE_MAP_POSITIVE_Z, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, or GL_TEXTURE_1D_ARRAY.
+		 * \param texture Specifies the texture object name for glTextureSubImage2D. The effective target of texture must be one of the
+		 *   valid target values above.
+		 * \param level Specifies the level-of-detail number. Level 0 is the base image level. Level n is the nth mipmap reduction image.
+		 * \param xoffset Specifies a texel offset in the x direction within the texture array.
+		 * \param yoffset Specifies a texel offset in the y direction within the texture array.
+		 * \param width Specifies the width of the texture subimage.
+		 * \param height Specifies the height of the texture subimage.
+		 * \param format Specifies the format of the pixel data. The following symbolic values are accepted: GL_RED, GL_RG, GL_RGB, GL_BGR,
+		 *   GL_RGBA, GL_BGRA, GL_DEPTH_COMPONENT, and GL_STENCIL_INDEX.
+		 * \param type Specifies the data type of the pixel data. The following symbolic values are accepted: GL_UNSIGNED_BYTE, GL_BYTE,
+		 *   GL_UNSIGNED_SHORT, GL_SHORT, GL_UNSIGNED_INT, GL_INT, GL_FLOAT, GL_UNSIGNED_BYTE_3_3_2, GL_UNSIGNED_BYTE_2_3_3_REV,
+		 *   GL_UNSIGNED_SHORT_5_6_5, GL_UNSIGNED_SHORT_5_6_5_REV, GL_UNSIGNED_SHORT_4_4_4_4, GL_UNSIGNED_SHORT_4_4_4_4_REV,
+		 *   GL_UNSIGNED_SHORT_5_5_5_1, GL_UNSIGNED_SHORT_1_5_5_5_REV, GL_UNSIGNED_INT_8_8_8_8, GL_UNSIGNED_INT_8_8_8_8_REV,
+		 *   GL_UNSIGNED_INT_10_10_10_2, and GL_UNSIGNED_INT_2_10_10_10_REV.
+		 * \param pixels Specifies a pointer to the image data in memory. 
+		 */
+		virtual void tex_subimage(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format,
+			GLenum type, const GLvoid * pixels) = 0;
+		
 		virtual ~ContextBase();
 		
 	protected:
@@ -403,6 +433,11 @@ namespace graphics
 		virtual void load_texture(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border,
 			GLenum format, GLenum type, const GLvoid *data);
 		
+		virtual void pixel_store(GLenum pname, GLint param);
+		
+		virtual void tex_subimage(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format,
+			GLenum type, const GLvoid * pixels);
+		
 		virtual ~Context();
 		
 	protected:
@@ -506,6 +541,11 @@ namespace graphics
 		
 		virtual void load_texture(GLenum /*target*/, GLint /*level*/, GLint /*internalFormat*/, GLsizei /*width*/, GLsizei /*height*/, GLint /*border*/,
 			GLenum /*format*/, GLenum /*type*/, const GLvoid */*data*/) {}
+		
+		virtual void pixel_store(GLenum pname, GLint param) {}
+		
+		virtual void tex_subimage(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format,
+			GLenum type, const GLvoid * pixels) {}
 		
 		virtual ~ContextStub() {}
 		

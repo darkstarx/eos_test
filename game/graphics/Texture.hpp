@@ -32,6 +32,10 @@ namespace graphics
 		 */
 		inline bool initialized() { return m_initialized; }
 		
+		/** \brief Получить размер текстуры в байтах
+		 */
+		size_t size() { return m_size; }
+		
 		/** \brief Использовать данную текстуру для отрисовки
 		 */
 		void use();
@@ -39,7 +43,15 @@ namespace graphics
 		/** \brief Получить идентификатор текстуры
 		 */
 		inline GLuint id() { return m_id; }
-
+		
+		/** \brief Получить описание текстуры
+		 */
+		inline const std::string& description() const { return m_description; }
+		
+		/** \brief Установить описание текстуры
+		 */
+		inline void set_description(const std::string &value) { m_description = value; }
+		
 		/** \brief Получить размеры тестуры
 		*/
 		inline dimension_t& dimension() { return m_dimension; }
@@ -57,10 +69,12 @@ namespace graphics
 		inline GLint unit_index() { return m_unit - GL_TEXTURE0; }
 		
 	private:
-		bool m_initialized;	      ///< Признак того, что текстура инициализирована
-		GLuint m_id;		      ///< Идентификатор текстуры
-		GLenum m_unit;		      ///< Текстурный юнит, для которого предназначена данная текстура
-		dimension_t m_dimension;  ///< Размеры текстуры
+		bool m_initialized;			///< Признак того, что текстура инициализирована
+		size_t m_size;				///< Размер текстуры в байтах
+		GLuint m_id;				///< Идентификатор текстуры
+		GLenum m_unit;				///< Текстурный юнит, для которого предназначена данная текстура
+		dimension_t m_dimension;	///< Размеры текстуры
+		std::string m_description;	///< Описание текстуры
 	};
 	
 }

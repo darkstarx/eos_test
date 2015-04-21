@@ -72,6 +72,7 @@ namespace graphics
 		
 		// Отмечаем, что текстура инициализирована
 		m_initialized = true;
+		m_size = image->data().size();
 	}
 	
 	
@@ -91,6 +92,7 @@ namespace graphics
 		m_id = 0;
 		// Отмечаем, что текстура деинициализирована
 		m_initialized = false;
+		m_size = 0;
 	}
 	
 	

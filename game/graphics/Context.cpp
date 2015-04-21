@@ -635,6 +635,18 @@ namespace graphics
 	}
 	
 	
+	void Context::pixel_store(GLenum pname, GLint param)
+	{
+		glPixelStorei(pname, param);
+	}
+	
+	
+	void Context::tex_subimage(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid *pixels)
+	{
+		glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels);
+	}
+	
+	
 	void Context::set_viewport(const rectangle_t& value)
 	{
 		glViewport(static_cast<int>(value.x), static_cast<int>(value.y), static_cast<int>(value.w), static_cast<int>(value.h));
