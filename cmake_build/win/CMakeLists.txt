@@ -116,10 +116,12 @@ list(APPEND GAME_DEFINES
 add_executable(${PROJECT_NAME} WIN32 ${SOURCE_FILES})
 target_link_libraries(${PROJECT_NAME} ${EXT_LIBRARIES} freetype)
 
-# Copy built binaries and resources for them into the `bin` directory
+# Copy assets and resources into the project directory
 string(REPLACE "/" "\\" PROJECT_DIR_WIN ${PROJECT_DIR})
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND xcopy ${PROJECT_DIR_WIN}\\resources\\* $(ProjectDir)resources\\ /e/q/r/y)
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND xcopy ${PROJECT_DIR_WIN}\\assets\\* $(ProjectDir)assets\\ /e/q/r/y)
+# Copy libraries into the Output Directory
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND xcopy ${PROJECT_DIR_WIN}\\lib\\win\\${LIB_PLATFORM}\\*.dll $(OutDir) /e/q/r/y)
 
 # Resources and assets paths
 list(APPEND GAME_DEFINES

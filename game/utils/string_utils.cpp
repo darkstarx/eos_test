@@ -1,6 +1,7 @@
 #include <utils/string_utils.hpp>
 #include <string.h>
 #include <wctype.h>
+#include <cctype>
 #include <algorithm>
 #include <utf8.h>
 

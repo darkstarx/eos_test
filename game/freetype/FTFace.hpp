@@ -6,6 +6,7 @@
 #include <utils/forwards.hpp>
 #include <ft2build.h>
 #include <freetype.h>
+#include <string>
 
 
 namespace freetype
