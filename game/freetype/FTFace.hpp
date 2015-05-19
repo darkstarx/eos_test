@@ -11,7 +11,7 @@
 
 namespace freetype
 {
-
+	
 	class FTFace
 	{
 	public:
@@ -19,13 +19,16 @@ namespace freetype
 		
 		~FTFace();
 		
-		/** \brief Получить глиф по коду символа
+		/** \brief Получить глиф символа по его коду
 		 * \param unicode Код символа.
-		 * \param need_bitmap Признак того, нужен ли bitmap для символа. Иногда требуются только параметры глифов,
-		 * такие как ascender и advance, в таком случае для оптимизации следует установить этот флаг в false.
-		 * \return Указатель на объект глифа. Может быть нулевой, если произошла ошибка загрузки шрифта.
+		 * \param need_bitmap Флаг, нужен ли bitmap для символа. Иногда нам требуются только параметры глифов,
+		 * вроде ascender и advance, в таком случае для оптимизации можно установить этот флаг в false.
+		 * \param outline_type Тип обводки.
+		 * \param outline_width Толщина обводки в пикселах.
+		 * \return Объект глифа. Может вернуть нулевой указатель, если произошла ошибка загрузки шрифта! Обязательно
+		 * проверять результат перед использованием!
 		 */
-		FTGlyphSPtr get_glyph(const char_t unicode, const bool need_bitmap) const;
+		FTGlyphSPtr get_glyph(const char_t unicode, const bool need_bitmap, glyph_outline_t outline_type = glyph_outline_t::none, float outline_width = 0.0f) const;
 		
 		/** \brief Получить размер шрифта
 		 */

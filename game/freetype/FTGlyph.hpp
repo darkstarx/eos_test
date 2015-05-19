@@ -17,14 +17,14 @@ namespace freetype
 	class FTGlyph
 	{
 	public:
-		FTGlyph(const FT_Face &face, const char_t unicode, bool need_bitmap);
+		FTGlyph(const FT_Face &face, const char_t unicode, bool need_bitmap, glyph_outline_t outline_type, float outline_width);
 		
 		~FTGlyph();
 		
 		/** \brief Получить битмап глифа
 		 * Создает битмап и заполняет его данными из глифа, если они есть, иначе возвращает пустой указатель.
 		 */
-		resources::ImageSPtr get_biamap();
+		resources::ImageSPtr get_bitmap();
 		
 		/** \brief Получить горизонтальное смещение пера для отрисовки следующего символа
 		 * Определен в пикселах, даже если битмап не загружается.
@@ -58,13 +58,14 @@ namespace freetype
 		inline bool is_control() const { return utils::string_utils::is_control(m_unicode); }
 		
 	private:
-		char_t m_unicode;		///< Код символа
-		FT_Glyph m_glyph;		///< Данные глифа
-		FT_Pos m_advance;		///< Смещение пера для следующего глифа
-		FT_Int m_width;			///< Ширина глифа
-		FT_Int m_height;		///< Высота глифа
-		FT_Int m_bearing_left;	///< Горизонтальное смещение от позиции пера до начала глифа.
-		FT_Int m_bearing_top;	///< Вертикальное смещение от позиции пера (базовой линии) до верхней точки глифа.
+		char_t m_unicode;		        ///< Код символа
+		FTLibrarySPtr m_library;		///< Библиотека freetype
+		resources::ImageSPtr m_bitmap; 	///< Битмап глифа
+		FT_Pos m_advance;		        ///< Смещение пера для следующего глифа
+		FT_Int m_width;			        ///< Ширина глифа
+		FT_Int m_height;		        ///< Высота глифа
+		FT_Int m_bearing_left;	        ///< Горизонтальное смещение от позиции пера до начала глифа.
+		FT_Int m_bearing_top;	        ///< Вертикальное смещение от позиции пера (базовой линии) до верхней точки глифа.
 	};
 	
 }

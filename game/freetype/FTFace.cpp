@@ -36,13 +36,13 @@ namespace freetype
 	}
 	
 	
-	FTGlyphSPtr FTFace::get_glyph(const char_t unicode, const bool need_bitmap) const
+	FTGlyphSPtr FTFace::get_glyph(const char_t unicode, const bool need_bitmap, glyph_outline_t outline_type, float outline_width) const
 	{
 		if (!m_face) {
 			LOG(ERR) << "m_face is NULL";
 			return FTGlyphSPtr();
 		}
-		return FTGlyphSPtr(new FTGlyph(m_face, unicode, need_bitmap));
+		return FTGlyphSPtr(new FTGlyph(m_face, unicode, need_bitmap, outline_type, outline_width));
 	}
 	
 	
