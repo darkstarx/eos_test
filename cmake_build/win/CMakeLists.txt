@@ -75,22 +75,6 @@ find_library(GLEW_LIBRARIES glew32
 	DOC "OpenGL libraries"
 )
 
-# Find SDL2
-find_library(SDL_LIB SDL2
-	PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}
-	DOC "SDL libraries"
-)
-# Find SDL2 Mixer
-find_library(SDLMIXER_LIB SDL2_Mixer
-	PATHS ${PROJECT_DIR}/lib/win/${LIB_PLATFORM}
-	DOC "SDL libraries"
-)
-set(SDL_LIBRARIES
-	${SDL_LIB}
-	${SDLMIXER_LIB}
-)
-
-
 include_directories(
 	${WINDOWS_DIR}
 	${DESKTOP_DIR}
@@ -103,7 +87,6 @@ include_directories(
 set(EXT_LIBRARIES
 	${OPENGL_LIBRARIES}
 	${GLEW_LIBRARIES}
-	${SDL_LIBRARIES}
 )
 
 include(${PROJECT_DIR}/cmake_build/common/freetype.cmake)

@@ -4,5 +4,5 @@
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int iCmdShow)
 {
-	return MainWindow::create_window();
+	return MainWindow::create_window(hInstance);
 }

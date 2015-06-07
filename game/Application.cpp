@@ -99,7 +99,7 @@ void Application::on_graphics_created()
 	m_scene->add_object(m_imgs);
 	m_scene->add_object(m_rect);
 	
-	m_task = m_task_queue->enqueue_repeatedly(std::bind(&Application::rotate_rect, this), 1.0 / 60.0);
+	m_task = renderer().tasks()->enqueue_repeatedly(std::bind(&Application::rotate_rect, this), 1.0 / 60.0);
 }
 
 
@@ -158,6 +158,8 @@ Application::Application()
 
 Application::~Application()
 {
+	// Отменяем задачи
+	renderer().tasks()->unqueue(m_task);
 	// Разрушаем сцену
 	m_scene.reset();
 	m_img.reset();

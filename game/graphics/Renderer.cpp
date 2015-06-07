@@ -6,6 +6,7 @@
 #include <graphics/MatrixStack.hpp>
 #include <resources/FileSystem.hpp>
 #include <utils/bytearray.hpp>
+#include <utils/task_queue.hpp>
 
 
 namespace graphics
@@ -108,20 +109,21 @@ namespace graphics
 	}
 	
 	
-	void Renderer::on_draw_frame()
+	bool Renderer::on_draw_frame()
 	{
 		// Проверка на необходимость обновления экрана
 		{
 			utils::scoped_lock guard(m_graphics_lock);
-			if (m_valid) return;
+			if (m_valid) return false;
 			m_valid = true;
 		}
 		// Очистить экран следует даже если графика не определена
 		ctx().clear_buffers(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// Если графика не определена, то рисовать нечего
-		if (!m_graphics) return;
+		if (!m_graphics) return false;
 		// Перерисовка кадра
 		m_graphics->draw();
+		return true;
 	}
 	
 	
@@ -174,6 +176,7 @@ namespace graphics
 	
 	Renderer::Renderer()
 	: m_valid(false)
+	, m_task_queue(new utils::task_queue)
 	{
 		LOG(INFO) << "Renderer created";
 	}

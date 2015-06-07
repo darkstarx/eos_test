@@ -2,10 +2,11 @@
 #include <Application.hpp>
 #include <graphics/Renderer.hpp>
 #include <utils/log.hpp>
+#include <utils/task_queue.hpp>
 #include <chrono>
 
 
-const float MainWindow::TICK_INTERVAL = 1000.0f / 60.0f;
+const long int MainWindow::TICK_INTERVAL = 1000 / 60;
 EGLNativeWindowType MainWindow::m_window = 0;
 EGLint MainWindow::m_width = 0;
 EGLint MainWindow::m_height = 0;
@@ -49,7 +50,7 @@ void MainWindow::graphics_worker()
 	renderer().on_surface_changed(m_width, m_height, true);
 	
 	// Для контроля fps определяем максимальный fps = 60
-	const std::chrono::microseconds normal_duration(static_cast<int>(TICK_INTERVAL * 1000));
+	const std::chrono::milliseconds normal_duration(TICK_INTERVAL);
 	std::chrono::time_point<std::chrono::system_clock> start, end;
 #ifndef NDEBUG
 	int frames = 0;
@@ -59,24 +60,28 @@ void MainWindow::graphics_worker()
 	while (m_render_working)
 	{
 		start = std::chrono::system_clock::now();
-		// Рисуем
+		// Обработка очереди графических задач
+		renderer().tasks()->process_queue();
+		// Отрисовка сцены
 		if (!renderer().is_valid())
 		{
 			renderer().on_draw_frame();
 			if (!eglSwapBuffers(m_display, m_surface))
 				LOG(ERR) << "eglSwapBuffers() returned error " << eglGetError();
+#ifndef NDEBUG
+		++frames;
+#endif
 		}
 		end = std::chrono::system_clock::now();
 		// Отмечаем длительность отрисовки кадра
-		const std::chrono::microseconds duration(std::chrono::duration_cast<std::chrono::microseconds>(end - start));
+		const std::chrono::milliseconds duration(std::chrono::duration_cast<std::chrono::milliseconds>(end - start));
 		// Если на отрисовку ушло меньше normal_duration, ждем следующего тика
 		if (duration < normal_duration)
 			std::this_thread::sleep_for(normal_duration - duration);
 #ifndef NDEBUG
-		++frames;
 		const std::chrono::milliseconds check_time(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - check_point));
 		if (check_time.count() >= 1000) {
-// 			DLOG(INFO) << "fps: " << frames;
+			DLOG(INFO) << "fps: " << frames;
 			frames = 0;
 			check_point = std::chrono::system_clock::now();
 		}

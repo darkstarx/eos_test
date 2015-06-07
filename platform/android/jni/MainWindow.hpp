@@ -13,7 +13,7 @@
 class MainWindow
 {
 private:
-	static const float TICK_INTERVAL;						///< Время между тиками в миллисекундах
+	static const long int TICK_INTERVAL;					///< Время между тиками в миллисекундах
 	
 public:
 	static void set_window(EGLNativeWindowType window);

@@ -15,12 +15,12 @@
 class MainWindow
 {
 private:
-	static const float TICK_INTERVAL;						///< Время между тиками в миллисекундах
+	static const long int TICK_INTERVAL;					///< Время между тиками в миллисекундах
 	static SDL_Window *m_window;							///< Окно приложения
 	static std::atomic<bool> m_render_working;				///< Признак активности графического потока
 	static std::shared_ptr<std::thread> m_render_thread;	///< Объект управления графическим потоком
 	
-	static void init_SDL_graphics();
+	static void init_graphics();
 	
 	static void graphics_worker();
 	

@@ -2,16 +2,17 @@
 #include <Application.hpp>
 #include <graphics/Renderer.hpp>
 #include <utils/log.hpp>
+#include <utils/task_queue.hpp>
 #include <chrono>
 
 
-const float MainWindow::TICK_INTERVAL = 1000.0f / 60.0f;
+const long int MainWindow::TICK_INTERVAL = 1000 / 60;
 SDL_Window *MainWindow::m_window = 0;
 std::atomic<bool> MainWindow::m_render_working;
 std::shared_ptr<std::thread> MainWindow::m_render_thread;
 
 
-void MainWindow::init_SDL_graphics()
+void MainWindow::init_graphics()
 {
 	// Инициализируем SDL графику
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -61,7 +62,7 @@ void MainWindow::graphics_worker()
 	renderer().on_surface_changed(WINDOW_WIDTH, WINDOW_HEIGHT, true);
 	
 	// Для контроля fps определяем максимальный fps = 60
-	const std::chrono::microseconds normal_duration(static_cast<int>(TICK_INTERVAL * 1000));
+	const std::chrono::milliseconds normal_duration(TICK_INTERVAL);
 	std::chrono::time_point<std::chrono::system_clock> start, end;
 #ifndef NDEBUG
 	int frames = 0;
@@ -71,23 +72,27 @@ void MainWindow::graphics_worker()
 	while (m_render_working)
 	{
 		start = std::chrono::system_clock::now();
-		// Рисуем
+		// Обработка очереди графических задач
+		renderer().tasks()->process_queue();
+		// Отрисовка сцены
 		if (!renderer().is_valid())
 		{
 			renderer().on_draw_frame();
 			SDL_GL_SwapWindow(m_window);
+#ifndef NDEBUG
+		++frames;
+#endif
 		}
 		end = std::chrono::system_clock::now();
 		// Отмечаем длительность отрисовки кадра
-		const std::chrono::microseconds duration(std::chrono::duration_cast<std::chrono::microseconds>(end - start));
+		const std::chrono::milliseconds duration(std::chrono::duration_cast<std::chrono::milliseconds>(end - start));
 		// Если на отрисовку ушло меньше normal_duration, ждем следующего тика
 		if (duration < normal_duration)
 			std::this_thread::sleep_for(normal_duration - duration);
 #ifndef NDEBUG
-		++frames;
 		const std::chrono::milliseconds check_time(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - check_point));
 		if (check_time.count() >= 1000) {
-// 			DLOG(INFO) << "fps: " << frames;
+			DLOG(INFO) << "fps: " << frames;
 			frames = 0;
 			check_point = std::chrono::system_clock::now();
 		}
@@ -123,7 +128,7 @@ int MainWindow::create_window()
 	app_create();
 	
 	// Создаем графическое окно
-	init_SDL_graphics();
+	init_graphics();
 	app().start();
 	
 	// Время последнего тика
@@ -134,7 +139,7 @@ int MainWindow::create_window()
 	{
 		// Ожидаем сообщений (пока их нет, основной поток спит или тикает)
 		SDL_Event event;
-		if (SDL_WaitEventTimeout(&event, (int)TICK_INTERVAL)) {
+		if (SDL_WaitEventTimeout(&event, TICK_INTERVAL)) {
 			// Получили сообщение
 			switch (event.type)
 			{

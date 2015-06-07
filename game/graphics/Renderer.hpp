@@ -72,6 +72,8 @@ namespace graphics
 		
 		inline bool is_valid() { return m_valid; }
 		
+		inline utils::task_queue_sptr& tasks() { return m_task_queue; }
+
 		/** \brief Обработать смену GL-поверхности
 		 * NOTE Выполняется в графическом потоке.
 		 * \param width Ширина GL-поверхности.
@@ -83,7 +85,7 @@ namespace graphics
 		/** \brief Обработать необходимость перерисовать кадр
 		 * NOTE Выполняется в графическом потоке.
 		 */
-		void on_draw_frame();
+		bool on_draw_frame();
 		
 		/** \brief Получить шейдерную программу
 		 */
@@ -93,6 +95,7 @@ namespace graphics
 		static Renderer* m_instance;			///< Единственный экземпляр отрисовщика
 		static RendererDestroyer m_destroyer;	///< Разрушитель экземпляра рендерера
 		bool m_valid;							///< Признак того, что графику следует перерисовать
+		utils::task_queue_sptr m_task_queue;	///< Очередь задач графического потока
 		shader_programs_t m_shader_programs;	///< Шейдерные программы
 		GContainerSPtr m_graphics;				///< Первичный контейнер графических объектов
 		utils::spin_lock m_graphics_lock;		///< Защита первичного графического объекта и флага актуальности графики
